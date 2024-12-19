@@ -37,12 +37,11 @@ On top of the previous Windows setup, follow these steps to build ftxui for MinG
 - `cmake --build build --config Release`.
 
 Now you will have access to some important folders:
-- `FTXUI/include/` contains the header files that can replace the ones in the `external/include/ftxui` folder of this
-  project. After replacing the contents of that folder, you have to remove all instances of `ftxui/` from the include
-  paths within the new header files.
-- `FTXUI/build/` contains the files to replace the `external/library/ftxui/windows` folder of this project, with the
-  caveat that you move `libftxui-component.dll`, `libftxui-dom.dll`, and `libftxui-screen.dll` to the `binary/windows`
-  folder.
+- `FTXUI/include/ftxui` contains the header files that can replace the ones in the `external/include/ftxui` folder of
+  this project. After replacing the contents of that folder, you have to remove all instances of `ftxui/` from the
+  include paths within the new header files.
+- `FTXUI/build` contains the files to replace the `external/library/ftxui/windows` and `binary/windows` folders of
+  this project.
 
 ### Linux
 On top of the previous Linux setup, follow these steps to build ftxui for Linux:
@@ -52,24 +51,21 @@ On top of the previous Linux setup, follow these steps to build ftxui for Linux:
 - `cmake --build build --config Release`.
 
 Now you will have access to some important folders:
-- `FTXUI/include/` contains the header files that can replace the ones in the `external/include/ftxui` folder of this
-  project. After replacing the contents of that folder, you have to remove all instances of `ftxui/` from the include
-  paths within the new header files.
-- `FTXUI/build/` contains the files to replace the `external/library/ftxui/linux` folder of this project, with the
-  caveat that you move `libftxui-component.so.[VERSION]`, `libftxui-dom.so.[VERSION]`, and
-  `libftxui-screen.so.[VERSION]` to the `binary/linux` folder. replace the contents of `external/library/ftxui/linux` in
-  this project.
+- `FTXUI/include/ftxui` contains the header files that can replace the ones in the `external/include/ftxui` folder of
+  this project. After replacing the contents of that folder, you have to remove all instances of `ftxui/` from the
+  include paths within the new header files.
+- `FTXUI/build` contains the files to replace the `external/library/ftxui/linux` and `binary/linux` folders of this
+  project.
 
 ## SDL
 ### Windows
 On top of the previous Windows setup, go to the [releases](https://github.com/libsdl-org/SDL/releases) page and download
 the file ending `mingw.zip`. Extract this and go to `x86_64-w64-mingw32` and you will have access to three important
 folders:
-- `bin` which contains the file that can replace the one in the `binary/windows` folder of this project.
 - `include/SDL2` which contains files that can replace the contents of the `external/include/sdl/windows` folder of this
   project.
-- `lib` which contains the files (not the folders) to replace the contents of the `external/library/sdl2/windows` folder
-  of this project.
+- `lib` which contains the files to replace the contents of the `external/library/sdl/windows` folder of this project.
+- `bin` which contains the file that can replace the one in the `binary/windows` folder of this project.
 
 ### Linux
 On top of the previous Linux setup, do the following to ensure your environment is set up correctly:
@@ -96,11 +92,10 @@ Now you have two important directories:
 On top of the previous Windows setup, go to the [releases](https://github.com/libsdl-org/SDL_mixer/releases) page and
 download the file ending `mingw.zip`. Extract this and go to `x86_64-w64-mingw32` and you will have access to three
 important folders:
+- `include/SDL2` which contains files that can replace the contents of the `external/include/sdl/windows` folder of this
+  project.
+- `lib` which contains the files to replace the contents of the `external/library/sdl/windows` folder of this project.
 - `bin` which contains the file that can replace the one in the `binary/windows` folder of this project.
-- `include/SDL2` which contains files that can replace the contents of the `external/include/sdl_mixer/windows` folder of
-  this project.
-- `lib` which contains the files (not the folders) to replace the contents of the `external/library/sdl_mixer/windows`
-  folder of this project.
 
 ### Linux
 On top of the previous Linux setup and the SDL setup, do the following to ensure your environment is set up correctly:
