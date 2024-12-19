@@ -5,7 +5,9 @@ This project is optimized to be built with the following targets in mind:
 
 Version information for dependencies can be found in `external/version_info.txt`.
 
-On both Windows and Linux the binary is statically linked to all libraries.
+On Windows the binary is statically linked to all system libraries, but dynamically linked to SDL, SDL_mixer and ftxui.
+On linux the binary is statically linked where possible (only libstdc++ and libgcc) and dynamically linked to everything
+else.
 
 After following the platform specific instructions below you can execute `script/build.sh` followed by `script/run.sh`
 from the root of the project to build and run the project.
@@ -35,11 +37,12 @@ On top of the previous Windows setup, follow these steps to build ftxui for MinG
 - `cmake --build build --config Release`.
 
 Now you will have access to some important folders:
-- `include/` contains the header files that can replace the ones in the `external/include/ftxui` folder of this project.
-  After replacing the contents of that folder, you have to remove all instances of `ftxui/` from the include paths
-  within the new header files.
-- `build/` contains `libftxui-component.dll`, `libftxui-dom.dll`, and `libftxui-screen.dll` which replace the contents
-  of `external/library/ftxui/windows` in this project.
+- `FTXUI/include/` contains the header files that can replace the ones in the `external/include/ftxui` folder of this
+  project. After replacing the contents of that folder, you have to remove all instances of `ftxui/` from the include
+  paths within the new header files.
+- `FTXUI/build/` contains the files to replace the `external/library/ftxui/windows` folder of this project, with the
+  caveat that you move `libftxui-component.dll`, `libftxui-dom.dll`, and `libftxui-screen.dll` to the `binary/windows`
+  folder.
 
 ### Linux
 On top of the previous Linux setup, follow these steps to build ftxui for Linux:
@@ -49,15 +52,17 @@ On top of the previous Linux setup, follow these steps to build ftxui for Linux:
 - `cmake --build build --config Release`.
 
 Now you will have access to some important folders:
-- `include/` contains the header files that can replace the ones in the `external/include/ftxui` folder of this project.
-  After replacing the contents of that folder, you have to remove all instances of `ftxui/` from the include paths
-  within the new header files.
-- `build/` contains `libftxui-component.so`, `libftxui-dom.so`, and `libftxui-screen.so` which replace the contents of
-  `external/library/ftxui/linux` in this project.
+- `FTXUI/include/` contains the header files that can replace the ones in the `external/include/ftxui` folder of this
+  project. After replacing the contents of that folder, you have to remove all instances of `ftxui/` from the include
+  paths within the new header files.
+- `FTXUI/build/` contains the files to replace the `external/library/ftxui/linux` folder of this project, with the
+  caveat that you move `libftxui-component.so.[VERSION]`, `libftxui-dom.so.[VERSION]`, and
+  `libftxui-screen.so.[VERSION]` to the `binary/linux` folder. replace the contents of `external/library/ftxui/linux` in
+  this project.
 
 ## SDL
 ### Windows
-On top of the previous windows setup, go to the [releases](https://github.com/libsdl-org/SDL/releases) page and download
+On top of the previous Windows setup, go to the [releases](https://github.com/libsdl-org/SDL/releases) page and download
 the file ending `mingw.zip`. Extract this and go to `x86_64-w64-mingw32` and you will have access to three important
 folders:
 - `bin` which contains the file that can replace the one in the `binary/windows` folder of this project.
@@ -67,11 +72,28 @@ folders:
   of this project.
 
 ### Linux
-Soon.
+On top of the previous Linux setup, do the following to ensure your environment is set up correctly:
+- Only run `sudo sed -i~orig -e 's/# deb-src/deb-src/' /etc/apt/sources.list` if you haven't already.
+- Only run `sudo apt update` if you just ran the previous command.
+- Run `sudo apt build-dep libsdl2-dev`.
+
+Now you can go to the [releases](https://github.com/libsdl-org/SDL/releases) page and download the
+`SDL2-[VERSION].tar.gz` file. Then run the following commands:
+- `tar -xvzf SDL2-[VERSION].tar.gz`
+- `cd SDL2-[VERSION] && mkdir build && cd build`
+- `../configure`
+- `make`
+
+Now you have two important directories:
+- `SDL2-[VERSION]/include` which contains the files that can replace the ones in the `external/include/sdl/linux` folder
+  of this project.
+- `SDL2-[VERSION]/build/build/.libs` which contains the files (excluding `.d` and `.o` files) that can replace the
+  contents of the `external/library/sdl2/linux` folder of this project. This folder has the caveat that you need to move
+  `libSDL2-2.0.so.0` to the `binary/linux` folder.
 
 ## SDL_mixer
 ### Windows
-On top of the previous windows setup, go to the [releases](https://github.com/libsdl-org/SDL_mixer/releases) page and
+On top of the previous Windows setup, go to the [releases](https://github.com/libsdl-org/SDL_mixer/releases) page and
 download the file ending `mingw.zip`. Extract this and go to `x86_64-w64-mingw32` and you will have access to three
 important folders:
 - `bin` which contains the file that can replace the one in the `binary/windows` folder of this project.
@@ -81,4 +103,20 @@ important folders:
   folder of this project.
 
 ### Linux
-Soon.
+On top of the previous Linux setup and the SDL setup, do the following to ensure your environment is set up correctly:
+- Go to the `SDL2-[VERSION]/build` folder and run `sudo make install`.
+- Run `sudo apt build-dep libsdl2-mixer-dev`.
+
+Now you can go to the [releases](https://github.com/libsdl-org/SDL_mixer/releases) page and download the
+`SDL2_mixer-[VERSION].tar.gz` file. Then run the following commands:
+- `tar -xvzf SDL2_mixer-[VERSION].tar.gz`
+- `cd SDL2_mixer-[VERSION] && mkdir build && cd build`
+- `../configure`
+- `make`
+
+Now you have two important directories:
+- `SDL2_mixer-[VERSION]/include` which contains the file that can replace the one in the `external/include/sdl/linux`
+  folder of this project.
+- `SDL2_mixer-[VERSION]/build/build/.libs` which contains the files (excluding `.d` and `.o` files) that can replace
+  the contents of the `external/library/sdl/linux` folder of this project. This folder has the caveat that you need to
+  move `libSDL2_mixer-2.0.so.0` to the `binary/linux` folder.
