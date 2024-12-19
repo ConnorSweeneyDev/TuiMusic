@@ -3,6 +3,7 @@
 #include <string>
 
 #include "SDL.h"
+#include "SDL_error.h"
 #include "SDL_main.h"
 #include "SDL_mixer.h"
 #include "component/component.hpp"
@@ -32,12 +33,20 @@ int main(int argc, char *argv[])
     std::cout << "No arguments are supported.\n";
     return EXIT_FAILURE;
   }
-  SDL_Init(SDL_INIT_AUDIO);
-  if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024) < 0)
+
+  if (SDL_Init(SDL_INIT_AUDIO) != 0)
   {
-    std::cerr << "Failed to initialize SDL_Mixer: " << Mix_GetError() << '\n';
-    return EXIT_FAILURE;
+    std::cout << "SDL_Init Error: " << SDL_GetError() << std::endl;
+    exit(1);
   }
+  if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
+  {
+    std::cout << "Mix_OpenAudio Error: " << Mix_GetError() << std::endl;
+    exit(1);
+  }
+  Mix_CloseAudio();
+  Mix_Quit();
+  SDL_Quit();
 
   auto summary = [&]
   {
