@@ -65,9 +65,10 @@ int main(int argc, char *argv[])
   auto summary = [&]
   {
     auto content = ftxui::vbox({
-      ftxui::hbox({ftxui::text(L"- done:   "), ftxui::text(L"3") | ftxui::bold}) | color(ftxui::Color::Green),
-      ftxui::hbox({ftxui::text(L"- active: "), ftxui::text(L"2") | ftxui::bold}) | color(ftxui::Color::RedLight),
-      ftxui::hbox({ftxui::text(L"- queue:  "), ftxui::text(L"9") | ftxui::bold}) | color(ftxui::Color::Red),
+      ftxui::hbox({ftxui::text("- " + title_str + ":   "), ftxui::text("3") | ftxui::bold}) |
+        color(ftxui::Color::Green),
+      ftxui::hbox({ftxui::text("- " + artist_str + ": "), ftxui::text("2") | ftxui::bold}) |
+        color(ftxui::Color::RedLight),
     });
     return window(ftxui::text(L" Summary "), content);
   };
