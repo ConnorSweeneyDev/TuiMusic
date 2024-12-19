@@ -1,7 +1,7 @@
 # Building and Executing
 This project is optimized to be built with the following targets in mind:
 - Windows 11 MinGW 64-bit GCC 14.2.0
-- Ubuntu 18.04 GLIBC Version 2.27
+- Ubuntu 22.04 GLIBC Version 2.35
 
 Version information for dependencies can be found in `external/version_info.txt`.
 
@@ -28,6 +28,7 @@ releases can be found [here](https://github.com/ArthurSonzogni/ftxui/releases).
 
 ### Windows
 On top of the previous Windows setup, follow these steps to build ftxui for MinGW:
+- Ensure that you have cmake installed, if not run `winget install Kitware.CMake`.
 - `git clone https://github.com/ArthurSonzogni/FTXUI.git && cd FTXUI && mkdir build`.
 - `cmake -B build -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=Release -G "MinGW Makefiles"`.
 - `cmake --build build --config Release`.
@@ -41,6 +42,7 @@ Now you will have access to some important folders:
 
 ### Linux
 On top of the previous Linux setup, follow these steps to build ftxui for Linux:
+- Ensure that you have cmake installed, if not run `sudo apt install cmake`.
 - `git clone https://github.com/ArthurSonzogni/FTXUI.git && cd FTXUI && mkdir build`.
 - `cmake -B build -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=Release -G "Unix Makefiles"`.
 - `cmake --build build --config Release`.
@@ -49,5 +51,5 @@ Now you will have access to some important folders:
 - `include/` contains the header files that can replace the ones in the `external/include/ftxui` folder of this project.
   After replacing the contents of that folder, you have to remove all instances of `ftxui/` from the include paths
   within the new header files.
-- `lib/` contains `libftxui-component.a`, `libftxui-dom.a`, and `libftxui-screen.a` which replace the contents of
+- `build/` contains `libftxui-component.a`, `libftxui-dom.a`, and `libftxui-screen.a` which replace the contents of
   `external/library/ftxui/linux` in this project.
