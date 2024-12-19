@@ -138,7 +138,7 @@ On top of the previous Linux setup, do the following:
   -DCMAKE_BUILD_TYPE=Release -G 'Unix Makefiles'`
 - Run `cmake --build . --config Release`
 
-Now you have one important folder; `taglib/taglib` contains the `.so.[NUMBERS]` and `.so` files that can go into the
+Now you have one important folder; `taglib/taglib` contains the `.so.[VERSION]` and `.so` files that can go into the
 `binary/linux` and `external/library/taglib/linux` folders respectively, and it also contains the `.h` and `.tcc` files
 that can go into the `external/include/taglib` folder. The `.h` and `.tcc` files are spread around not just in this
 folder, but also all of it's subfolders.
