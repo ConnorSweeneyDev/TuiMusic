@@ -7,33 +7,47 @@
 #include "screen/color.hpp"
 #include "screen/screen.hpp"
 
-int main()
+#include "SDL.h"
+#include "SDL_main.h"
+#include "SDL_mixer.h"
+
+int main(int argc, char *argv[])
 {
-  using namespace ftxui;
+  if (argc > 1 || argv[1] != nullptr)
+  {
+    std::cout << "No arguments are supported.\n";
+    return EXIT_FAILURE;
+  }
+  SDL_Init(SDL_INIT_AUDIO);
+  if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024) < 0)
+  {
+    std::cerr << "Failed to initialize SDL_Mixer: " << Mix_GetError() << '\n';
+    return EXIT_FAILURE;
+  }
 
   auto summary = [&]
   {
-    auto content = vbox({
-      hbox({text(L"- done:   "), text(L"3") | bold}) | color(Color::Green),
-      hbox({text(L"- active: "), text(L"2") | bold}) | color(Color::RedLight),
-      hbox({text(L"- queue:  "), text(L"9") | bold}) | color(Color::Red),
+    auto content = ftxui::vbox({
+      ftxui::hbox({ftxui::text(L"- done:   "), ftxui::text(L"3") | ftxui::bold}) | color(ftxui::Color::Green),
+      ftxui::hbox({ftxui::text(L"- active: "), ftxui::text(L"2") | ftxui::bold}) | color(ftxui::Color::RedLight),
+      ftxui::hbox({ftxui::text(L"- queue:  "), ftxui::text(L"9") | ftxui::bold}) | color(ftxui::Color::Red),
     });
-    return window(text(L" Summary "), content);
+    return window(ftxui::text(L" Summary "), content);
   };
 
-  auto document = vbox({
-    hbox({
+  auto document = ftxui::vbox({
+    ftxui::hbox({
       summary(),
       summary(),
-      summary() | flex,
+      summary() | ftxui::flex,
     }),
     summary(),
     summary(),
   });
 
-  document = document | size(WIDTH, LESS_THAN, 80);
+  document = document | size(ftxui::WIDTH, ftxui::LESS_THAN, 80);
 
-  auto screen = Screen::Create(Dimension::Full(), Dimension::Fit(document));
+  auto screen = ftxui::Screen::Create(ftxui::Dimension::Full(), ftxui::Dimension::Fit(document));
   Render(screen, document);
 
   std::cout << screen.ToString() << '\0' << std::endl;

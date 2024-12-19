@@ -22,34 +22,63 @@ Do the following on Ubuntu to ensure your environment is set up correctly:
 - Only run `sudo apt update && sudo apt upgrade` if you haven't already.
 - Run `sudo apt install git g++ gdb make`.
 
-# Updating ftxui
-Since the library files are all within the project, to update ftxui for each platform some extra steps are required. The
-releases can be found [here](https://github.com/ArthurSonzogni/ftxui/releases).
+# Updating Libraries
+Since the library files are all within the project, to update the libraries for each platform some extra steps are
+required.
 
+## ftxui
 ### Windows
 On top of the previous Windows setup, follow these steps to build ftxui for MinGW:
 - Ensure that you have cmake installed, if not run `winget install Kitware.CMake`.
 - `git clone https://github.com/ArthurSonzogni/FTXUI.git && cd FTXUI && mkdir build`.
-- `cmake -B build -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=Release -G "MinGW Makefiles"`.
+- `cmake -B build -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Release -G "MinGW Makefiles"`.
 - `cmake --build build --config Release`.
 
 Now you will have access to some important folders:
 - `include/` contains the header files that can replace the ones in the `external/include/ftxui` folder of this project.
   After replacing the contents of that folder, you have to remove all instances of `ftxui/` from the include paths
   within the new header files.
-- `build/` contains `libftxui-component.a`, `libftxui-dom.a`, and `libftxui-screen.a` which replace the contents of
-  `external/library/ftxui/windows` in this project.
+- `build/` contains `libftxui-component.dll`, `libftxui-dom.dll`, and `libftxui-screen.dll` which replace the contents
+  of `external/library/ftxui/windows` in this project.
 
 ### Linux
 On top of the previous Linux setup, follow these steps to build ftxui for Linux:
 - Ensure that you have cmake installed, if not run `sudo apt install cmake`.
 - `git clone https://github.com/ArthurSonzogni/FTXUI.git && cd FTXUI && mkdir build`.
-- `cmake -B build -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=Release -G "Unix Makefiles"`.
+- `cmake -B build -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Release -G "Unix Makefiles"`.
 - `cmake --build build --config Release`.
 
 Now you will have access to some important folders:
 - `include/` contains the header files that can replace the ones in the `external/include/ftxui` folder of this project.
   After replacing the contents of that folder, you have to remove all instances of `ftxui/` from the include paths
   within the new header files.
-- `build/` contains `libftxui-component.a`, `libftxui-dom.a`, and `libftxui-screen.a` which replace the contents of
+- `build/` contains `libftxui-component.so`, `libftxui-dom.so`, and `libftxui-screen.so` which replace the contents of
   `external/library/ftxui/linux` in this project.
+
+## SDL
+### Windows
+On top of the previous windows setup, go to the [releases](https://github.com/libsdl-org/SDL/releases) page and download
+the file ending `mingw.zip`. Extract this and go to `x86_64-w64-mingw32` and you will have access to three important
+folders:
+- `bin` which contains the file that can replace the one in the `binary/windows` folder of this project.
+- `include/SDL2` which contains files that can replace the contents of the `external/include/sdl/windows` folder of this
+  project.
+- `lib` which contains the files (not the folders) to replace the contents of the `external/library/sdl2/windows` folder
+  of this project.
+
+### Linux
+Soon.
+
+## SDL_mixer
+### Windows
+On top of the previous windows setup, go to the [releases](https://github.com/libsdl-org/SDL_mixer/releases) page and
+download the file ending `mingw.zip`. Extract this and go to `x86_64-w64-mingw32` and you will have access to three
+important folders:
+- `bin` which contains the file that can replace the one in the `binary/windows` folder of this project.
+- `include/SDL2` which contains files that can replace the contents of the `external/include/sdl_mixer/windows` folder of
+  this project.
+- `lib` which contains the files (not the folders) to replace the contents of the `external/library/sdl_mixer/windows`
+  folder of this project.
+
+### Linux
+Soon.

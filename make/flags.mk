@@ -7,9 +7,9 @@ endif
 
 WARNINGS := -Wall -Wextra -Wpedantic -Wconversion -Wshadow -Wundef -Wclobbered -Wdeprecated -Wmultichar -Wuninitialized -Wunreachable-code -Wstrict-aliasing -Wreturn-type -Wtype-limits -Wformat-security -Wpointer-arith -Wmaybe-uninitialized -Wempty-body -Wdouble-promotion -Wcast-qual -Wcast-align -Wfloat-equal -Wlogical-op -Wduplicated-cond -Wshift-overflow=2 -Wformat=2
 INCLUDES := -Iprogram/include
-SYSTEM_INCLUDES := -isystemexternal/include -isystemexternal/include/ftxui
 ifeq ($(UNAME), Windows)
-  LIBRARIES := -Lexternal/library/ftxui/windows -static -Wl,-Bstatic -lgcc -lstdc++ -lftxui-component -lftxui-dom -lftxui-screen
+  SYSTEM_INCLUDES := -isystemexternal/include -isystemexternal/include/ftxui -isystemexternal/include/sdl/windows
+  LIBRARIES := -Lexternal/library/ftxui/windows -Lexternal/library/sdl/windows -static -Wl,-Bstatic -lgcc -lstdc++ -lssp -lwinpthread -Wl,-Bdynamic -lftxui-component -lftxui-dom -lftxui-screen -lmingw32 -lSDL2main -lSDL2 -lSDL2_mixer
 else ifeq ($(UNAME), Linux)
   LIBRARIES := -Lexternal/library/ftxui/linux -static -ldl -lm -lc -lgcc -lstdc++ -lftxui-component -lftxui-dom -lftxui-screen -Wl,-rpath,'$$ORIGIN'
 endif
