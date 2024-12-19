@@ -27,7 +27,7 @@ Since the library files are all within the project, to update ftxui for each pla
 releases can be found [here](https://github.com/ArthurSonzogni/ftxui/releases).
 
 ### Windows
-On top of the previous windows setup, follow these steps to build ftxui for MinGW:
+On top of the previous Windows setup, follow these steps to build ftxui for MinGW:
 - `git clone https://github.com/ArthurSonzogni/FTXUI.git && cd FTXUI && mkdir build`.
 - `cmake -B build -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=Release -G "MinGW Makefiles"`.
 - `cmake --build build --config Release`.
@@ -40,8 +40,12 @@ Now you will have access to some important folders:
   `external/library/ftxui/windows` in this project.
 
 ### Linux
-On top of the previous linux setup, you can go to the releases page and download the release ending in `Linux.tar.gz`.
-After extracting the archive, you will have access to some important folders:
+On top of the previous Linux setup, follow these steps to build ftxui for Linux:
+- `git clone https://github.com/ArthurSonzogni/FTXUI.git && cd FTXUI && mkdir build`.
+- `cmake -B build -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=Release -G "Unix Makefiles"`.
+- `cmake --build build --config Release`.
+
+Now you will have access to some important folders:
 - `include/` contains the header files that can replace the ones in the `external/include/ftxui` folder of this project.
   After replacing the contents of that folder, you have to remove all instances of `ftxui/` from the include paths
   within the new header files.
