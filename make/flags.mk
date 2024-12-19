@@ -11,5 +11,6 @@ ifeq ($(UNAME), Windows)
   SYSTEM_INCLUDES := -isystemexternal/include -isystemexternal/include/ftxui -isystemexternal/include/sdl/windows
   LIBRARIES := -Lexternal/library/ftxui/windows -Lexternal/library/sdl/windows -static -Wl,-Bstatic -lgcc -lstdc++ -lssp -lwinpthread -Wl,-Bdynamic -lftxui-component -lftxui-dom -lftxui-screen -lmingw32 -lSDL2main -lSDL2 -lSDL2_mixer
 else ifeq ($(UNAME), Linux)
-  LIBRARIES := -Lexternal/library/ftxui/linux -static -ldl -lm -lc -lgcc -lstdc++ -lftxui-component -lftxui-dom -lftxui-screen -Wl,-rpath,'$$ORIGIN'
+  SYSTEM_INCLUDES := -isystemexternal/include -isystemexternal/include/ftxui -isystemexternal/include/sdl/linux
+  LIBRARIES := -Lexternal/library/ftxui/linux -Lexternal/library/sdl/linux -static-libstdc++ -static-libgcc -ldl -lm -lc -lftxui-component -lftxui-dom -lftxui-screen -lpthread -lSDL2 -lSDL2_mixer -Wl,-rpath,'$$ORIGIN'
 endif
