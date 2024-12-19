@@ -117,3 +117,28 @@ Now you have two important directories:
   folder of this project.
 - `SDL2_mixer-[VERSION]/build/build/.libs` which contains the files that can replace the contents of the
   `external/library/sdl/linux` and `binary/linux` folders of this project.
+
+## TagLib
+### Windows
+On top of the previous Windows setup, do the following:
+- Run `git clone https://github.com/taglib/taglib.git && cd taglib && git submodule update --init`
+- Run `cmake -B . -DBUILD_SHARED_LIBS=ON -DVISIBILITY_HIDDEN=ON -DBUILD_EXAMPLES=ON -DBUILD_BINDINGS=ON -DWITH_ZLIB=OFF
+  -DCMAKE_BUILD_TYPE=Release -G 'MinGW Makefiles'`
+- Run `cmake --build . --config Release`
+
+Now you have one important folder; `taglib/taglib` contains the `.dll` and `.dll.a` files that can go into the
+`binary/windows` and `external/library/taglib/windows` folders respectively, and it also contains the `.h` and `.tcc`
+files that can go into the `external/include/taglib` folder. The `.h` and `.tcc` files are spread around not just in
+this folder, but also all of it's subfolders.
+
+### Linux
+On top of the previous Linux setup, do the following:
+- Run `git clone https://github.com/taglib/taglib.git && cd taglib && git submodule update --init`
+- Run `cmake -B . -DBUILD_SHARED_LIBS=ON -DVISIBILITY_HIDDEN=ON -DBUILD_EXAMPLES=ON -DBUILD_BINDINGS=ON -DWITH_ZLIB=OFF
+  -DCMAKE_BUILD_TYPE=Release -G 'Unix Makefiles'`
+- Run `cmake --build . --config Release`
+
+Now you have one important folder; `taglib/taglib` contains the `.so.[NUMBERS]` and `.so` files that can go into the
+`binary/linux` and `external/library/taglib/linux` folders respectively, and it also contains the `.h` and `.tcc` files
+that can go into the `external/include/taglib` folder. The `.h` and `.tcc` files are spread around not just in this
+folder, but also all of it's subfolders.

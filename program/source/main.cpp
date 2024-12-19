@@ -50,7 +50,10 @@ int main(int argc, char *argv[])
   Mix_Quit();
   SDL_Quit();
 
-  std::string file_name = "D:\\CPP\\TuiMusic\\7 - Prince.mp3";
+  // WINDOWS
+  std::string file_name = "D:/CPP/TuiMusic/7 - Prince.mp3";
+  // LINUX
+  // std::string file_name = "/mnt/d/CPP/TuiMusic/7 - Prince.mp3";
   TagLib::FileRef file(file_name.c_str());
   TagLib::String title_tag = file.tag()->title();
   std::string title_str = title_tag.to8Bit(true);

@@ -1,3 +1,4 @@
 ftxui: 5.0.0
 SDL: 2.30.10
 SDL_mixer: 2.8.0
+TagLib: 2.0.2
