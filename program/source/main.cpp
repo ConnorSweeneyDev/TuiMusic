@@ -1,15 +1,29 @@
 #include <cstdlib>
 #include <iostream>
+#include <string>
 
+#include "SDL.h"
+#include "SDL_main.h"
+#include "SDL_mixer.h"
+#include "component/component.hpp"
+#include "component/component_options.hpp"
 #include "dom/deprecated.hpp"
 #include "dom/elements.hpp"
 #include "dom/node.hpp"
 #include "screen/color.hpp"
 #include "screen/screen.hpp"
 
-#include "SDL.h"
-#include "SDL_main.h"
-#include "SDL_mixer.h"
+ftxui::ButtonOption Style()
+{
+  auto option = ftxui::ButtonOption::Animated();
+  option.transform = [](const ftxui::EntryState &s)
+  {
+    auto element = ftxui::text(s.label);
+    if (s.focused) { element |= ftxui::bold; }
+    return element | ftxui::center | ftxui::borderEmpty | ftxui::flex;
+  };
+  return option;
+}
 
 int main(int argc, char *argv[])
 {
@@ -44,13 +58,11 @@ int main(int argc, char *argv[])
     summary(),
     summary(),
   });
-
   document = document | size(ftxui::WIDTH, ftxui::LESS_THAN, 80);
 
   auto screen = ftxui::Screen::Create(ftxui::Dimension::Full(), ftxui::Dimension::Fit(document));
   Render(screen, document);
 
   std::cout << screen.ToString() << '\0' << std::endl;
-
   return EXIT_SUCCESS;
 }
