@@ -62,10 +62,12 @@ Now you will have access to some important folders:
 On top of the previous Windows setup, go to the [releases](https://github.com/libsdl-org/SDL/releases) page and download
 the file ending `mingw.zip`. Extract this and go to `x86_64-w64-mingw32` and you will have access to three important
 folders:
-- `include/SDL2` which contains files that can replace the contents of the `external/include/sdl/windows` folder of this
+- `x86_64-w64-mingw32/include/SDL2` which contains files that can replace the contents of the
+  `external/include/sdl/windows` folder of this project.
+- `x86_64-w64-mingw32/lib` which contains the files to replace the contents of the `external/library/sdl/windows` folder
+  of this project.
+- `x86_64-w64-mingw32/bin` which contains the file that can replace the one in the `binary/windows` folder of this
   project.
-- `lib` which contains the files to replace the contents of the `external/library/sdl/windows` folder of this project.
-- `bin` which contains the file that can replace the one in the `binary/windows` folder of this project.
 
 ### Linux
 On top of the previous Linux setup, do the following to ensure your environment is set up correctly:
@@ -92,10 +94,12 @@ Now you have two important directories:
 On top of the previous Windows setup, go to the [releases](https://github.com/libsdl-org/SDL_mixer/releases) page and
 download the file ending `mingw.zip`. Extract this and go to `x86_64-w64-mingw32` and you will have access to three
 important folders:
-- `include/SDL2` which contains files that can replace the contents of the `external/include/sdl/windows` folder of this
+- `x86_64-w64-mingw32/include/SDL2` which contains files that can replace the contents of the
+  `external/include/sdl/windows` folder of this project.
+- `x86_64-w64-mingw32/lib` which contains the files to replace the contents of the `external/library/sdl/windows` folder
+  of this project.
+- `x86_64-w64-mingw32/bin` which contains the file that can replace the one in the `binary/windows` folder of this
   project.
-- `lib` which contains the files to replace the contents of the `external/library/sdl/windows` folder of this project.
-- `bin` which contains the file that can replace the one in the `binary/windows` folder of this project.
 
 ### Linux
 On top of the previous Linux setup and the SDL setup, do the following to ensure your environment is set up correctly:
