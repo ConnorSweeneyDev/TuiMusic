@@ -11,8 +11,10 @@
 #include "dom/deprecated.hpp"
 #include "dom/elements.hpp"
 #include "dom/node.hpp"
+#include "fileref.h"
 #include "screen/color.hpp"
 #include "screen/screen.hpp"
+#include "tstring.h"
 
 ftxui::ButtonOption Style()
 {
@@ -47,6 +49,15 @@ int main(int argc, char *argv[])
   Mix_CloseAudio();
   Mix_Quit();
   SDL_Quit();
+
+  std::string file_name = "D:\\CPP\\TuiMusic\\7 - Prince.mp3";
+  TagLib::FileRef file(file_name.c_str());
+  TagLib::String title_tag = file.tag()->title();
+  std::string title_str = title_tag.to8Bit(true);
+  TagLib::String artist_tag = file.tag()->artist();
+  std::string artist_str = artist_tag.to8Bit(true);
+  std::cout << title_str << std::endl;
+  std::cout << artist_str << std::endl;
 
   auto summary = [&]
   {
