@@ -85,9 +85,8 @@ Now you can go to the [releases](https://github.com/libsdl-org/SDL/releases) pag
 Now you have two important directories:
 - `SDL2-[VERSION]/include` which contains the files that can replace the ones in the `external/include/sdl/linux` folder
   of this project.
-- `SDL2-[VERSION]/build/build/.libs` which contains the files (excluding `.d` and `.o` files) that can replace the
-  contents of the `external/library/sdl2/linux` folder of this project. This folder has the caveat that you need to move
-  `libSDL2-2.0.so.0` to the `binary/linux` folder.
+- `SDL2-[VERSION]/build/build/.libs` which contains the files that can replace the contents of the
+  `external/library/sdl2/linux` and `binary/linux` folders of this project. 
 
 ## SDL_mixer
 ### Windows
@@ -116,6 +115,5 @@ Now you can go to the [releases](https://github.com/libsdl-org/SDL_mixer/release
 Now you have two important directories:
 - `SDL2_mixer-[VERSION]/include` which contains the file that can replace the one in the `external/include/sdl/linux`
   folder of this project.
-- `SDL2_mixer-[VERSION]/build/build/.libs` which contains the files (excluding `.d` and `.o` files) that can replace
-  the contents of the `external/library/sdl/linux` folder of this project. This folder has the caveat that you need to
-  move `libSDL2_mixer-2.0.so.0` to the `binary/linux` folder.
+- `SDL2_mixer-[VERSION]/build/build/.libs` which contains the files that can replace the contents of the
+  `external/library/sdl/linux` and `binary/linux` folders of this project.
