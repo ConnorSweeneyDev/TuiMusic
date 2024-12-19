@@ -10,7 +10,7 @@ On linux the binary is statically linked where possible (only libstdc++ and libg
 else.
 
 After following the platform specific instructions below you can execute `script/build.sh` followed by `script/run.sh`
-from the root of the project to build and run the project.
+(or `script/run.bat` on Windows) from the root of the project to build and run it.
 
 ### Windows
 Do the following to ensure your environment is set up correctly:
