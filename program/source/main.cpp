@@ -10,7 +10,7 @@
 #include "SDL_main.h"
 #include "SDL_mixer.h"
 #include "SDL_timer.h"
-#include "fileref.h"
+#include "taglib/fileref.h"
 #include "ftxui/component/component.hpp"
 #include "ftxui/component/component_base.hpp"
 #include "ftxui/component/component_options.hpp"
