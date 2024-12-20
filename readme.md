@@ -118,27 +118,31 @@ Now you have two important directories:
 - `SDL2_mixer-[VERSION]/build/build/.libs` which contains the files that can replace the contents of the
   `external/library/sdl/linux` and `binary/linux` folders of this project.
 
-## TagLib
+## ID3v2lib
 ### Windows
-On top of the previous Windows setup, do the following:
-- Run `git clone https://github.com/taglib/taglib.git && cd taglib && git submodule update --init`
-- Run `cmake -B . -DBUILD_SHARED_LIBS=ON -DVISIBILITY_HIDDEN=ON -DBUILD_EXAMPLES=ON -DBUILD_BINDINGS=ON -DWITH_ZLIB=OFF
-  -DCMAKE_BUILD_TYPE=Release -G 'MinGW Makefiles'`
-- Run `cmake --build . --config Release`
+On top of the previous Windows setup, go to the [releases](https://github.com/larsbs/id3v2lib/tags) page and download
+the source code. Extract it and run the following commands:
+- Ensure that you have cmake installed, if not run `winget install Kitware.CMake`.
+- `cd id3v2lib-[VERSION] && mkdir build`
+- `cmake -B build -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Release -G "MinGW Makefiles"`
+- `cmake --build build --config Release`
 
-Now you have one important folder; `taglib/taglib` contains the `.dll` and `.dll.a` files that can go into the
-`binary/windows` and `external/library/taglib/windows` folders respectively, and it also contains the `.h` and `.tcc`
-files that can go into the `external/include/taglib` folder. The `.h` and `.tcc` files are spread around not just in
-this folder, but also all of it's subfolders.
+Now you have two important folders:
+- `id3v2lib-[VERSION]/include` which contains the files that can replace the ones in the `external/include/id3v2` folder
+  of this project.
+- `id3v2lib-[VERSION]/build/src` which contains the files that can replace the contents of the `binary/windows` and
+  `external/library/id3v2/windows` folders of this project.
 
 ### Linux
-On top of the previous Linux setup, do the following:
-- Run `git clone https://github.com/taglib/taglib.git && cd taglib && git submodule update --init`
-- Run `cmake -B . -DBUILD_SHARED_LIBS=ON -DVISIBILITY_HIDDEN=ON -DBUILD_EXAMPLES=ON -DBUILD_BINDINGS=ON -DWITH_ZLIB=OFF
-  -DCMAKE_BUILD_TYPE=Release -G 'Unix Makefiles'`
-- Run `cmake --build . --config Release`
+On top of the previous Linux setup, go to the [releases](https://github.com/larsbs/id3v2lib/tags) page and download
+the source code. Extract it and run the following commands:
+- Ensure that you have cmake installed, if not run `sudo apt install cmake`.
+- `cd id3v2lib-[VERSION] && mkdir build`
+- `cmake -B build -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Release -G "Unix Makefiles"`
+- `cmake --build build --config Release`
 
-Now you have one important folder; `taglib/taglib` contains the `.so.[VERSION]` and `.so` files that can go into the
-`binary/linux` and `external/library/taglib/linux` folders respectively, and it also contains the `.h` and `.tcc` files
-that can go into the `external/include/taglib` folder. The `.h` and `.tcc` files are spread around not just in this
-folder, but also all of it's subfolders.
+Now you have two important folders:
+- `id3v2lib-[VERSION]/include` which contains the files that can replace the ones in the `external/include/id3v2` folder
+  of this project.
+- `id3v2lib-[VERSION]/build/src` which contains the files that can replace the contents of the `binary/linux` and
+  `external/library/id3v2/linux` folders of this project.

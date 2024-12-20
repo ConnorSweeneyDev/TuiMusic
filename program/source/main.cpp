@@ -1,11 +1,11 @@
 #include <cctype>
 #include <cstdlib>
-#include <fileref.h>
 #include <filesystem>
 #include <iostream>
 #include <string>
 #include <vector>
 
+#include "D:/CPP/TuiMusic/external/include/ftxui/screen/screen.hpp"
 #include "SDL.h"
 #include "SDL_error.h"
 #include "SDL_main.h"
@@ -18,7 +18,7 @@
 #include "ftxui/component/screen_interactive.hpp"
 #include "ftxui/dom/elements.hpp"
 #include "ftxui/util/ref.hpp"
-#include "taglib/tstring.h"
+#include "id3v2lib.compat.h"
 
 int main(int argc, char *argv[])
 {
@@ -31,17 +31,17 @@ int main(int argc, char *argv[])
   if (SDL_Init(SDL_INIT_AUDIO) != 0)
   {
     std::cout << "SDL_Init Error: " << SDL_GetError() << std::endl;
-    exit(1);
+    exit(EXIT_FAILURE);
   }
   if (Mix_Init(MIX_INIT_MP3) == 0)
   {
     std::cout << "Mix_Init Error: " << Mix_GetError() << std::endl;
-    exit(1);
+    exit(EXIT_FAILURE);
   }
   if (Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 2048) != 0)
   {
     std::cout << "Mix_OpenAudio Error: " << Mix_GetError() << std::endl;
-    exit(1);
+    exit(EXIT_FAILURE);
   }
 
   std::filesystem::path song = std::filesystem::current_path() / "7 - Prince.mp3";
@@ -49,23 +49,28 @@ int main(int argc, char *argv[])
   if (music == nullptr)
   {
     std::cout << "Mix_LoadMUS Error: \"" << song << "\": " << Mix_GetError() << std::endl;
-    exit(1);
+    exit(EXIT_FAILURE);
   }
   Mix_VolumeMusic(MIX_MAX_VOLUME / 10);
   Mix_PlayMusic(music, 0);
-  TagLib::FileRef file(song.string().c_str());
-  if (file.isNull())
+
+  ID3v2_tag *song_tag = load_tag(song.string().c_str());
+  if (song_tag == nullptr)
   {
-    std::cout << "FileRef Error: \"" << song << "\" could not be loaded." << std::endl;
-    exit(1);
+    std::cout << "load_tag Error: \"" << song << "\": Could not read tags." << std::endl;
+    exit(EXIT_FAILURE);
   }
-  TagLib::String title_tag = file.tag()->title();
-  std::string title = title_tag.to8Bit(true);
-  TagLib::String artist_tag = file.tag()->artist();
-  std::string artist = artist_tag.to8Bit(true);
-  std::cout << "Playing: " << title << " - " << artist << std::endl;
+  ID3v2_frame *title_frame = tag_get_title(song_tag);
+  ID3v2_frame_text_content *title_content = parse_text_frame_content(title_frame);
+  std::string title = title_content->data;
+  ID3v2_frame *artist_frame = tag_get_artist(song_tag);
+  ID3v2_frame_text_content *artist_content = parse_text_frame_content(artist_frame);
+  std::string artist = artist_content->data;
 
   auto screen = ftxui::ScreenInteractive::Fullscreen();
+  ftxui::Screen::Cursor cursor;
+  cursor.shape = ftxui::Screen::Cursor::Hidden;
+  screen.SetCursor(cursor);
 
   std::vector<std::string> entries = {title + " - " + artist, "test"};
   int selected = 0;

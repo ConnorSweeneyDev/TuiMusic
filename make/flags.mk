@@ -8,9 +8,9 @@ endif
 WARNINGS := -Wall -Wextra -Wpedantic -Wconversion -Wshadow -Wundef -Wclobbered -Wdeprecated -Wmultichar -Wuninitialized -Wunreachable-code -Wstrict-aliasing -Wreturn-type -Wtype-limits -Wformat-security -Wpointer-arith -Wmaybe-uninitialized -Wempty-body -Wdouble-promotion -Wcast-qual -Wcast-align -Wfloat-equal -Wlogical-op -Wduplicated-cond -Wshift-overflow=2 -Wformat=2
 INCLUDES := -Iprogram/include
 ifeq ($(UNAME), Windows)
-  SYSTEM_INCLUDES := -isystemexternal/include -isystemexternal/include/ftxui -isystemexternal/include/sdl/windows -isystemexternal/include/taglib
-  LIBRARIES := -Lexternal/library/ftxui/windows -Lexternal/library/sdl/windows -Lexternal/library/taglib/windows -static -Wl,-Bstatic -lgcc -lstdc++ -lssp -lwinpthread -Wl,-Bdynamic -lftxui-component -lftxui-dom -lftxui-screen -lmingw32 -lSDL2main -lSDL2 -lSDL2_mixer -ltag
+  SYSTEM_INCLUDES := -isystemexternal/include -isystemexternal/include/ftxui -isystemexternal/include/sdl/windows -isystemexternal/include/id3v2
+  LIBRARIES := -Lexternal/library/ftxui/windows -Lexternal/library/sdl/windows -Lexternal/library/id3v2/windows -static -Wl,-Bstatic -lgcc -lstdc++ -lssp -lwinpthread -Wl,-Bdynamic -lftxui-component -lftxui-dom -lftxui-screen -lmingw32 -lSDL2main -lSDL2 -lSDL2_mixer -lid3v2lib
 else ifeq ($(UNAME), Linux)
-  SYSTEM_INCLUDES := -isystemexternal/include -isystemexternal/include/ftxui -isystemexternal/include/sdl/linux -isystemexternal/include/taglib
-  LIBRARIES := -Lexternal/library/ftxui/linux -Lexternal/library/sdl/linux -Lexternal/library/taglib/linux -static-libstdc++ -static-libgcc -ldl -lm -lc -lpthread -lftxui-component -lftxui-dom -lftxui-screen -lSDL2 -lSDL2_mixer -ltag -Wl,-rpath,'$$ORIGIN'
+  SYSTEM_INCLUDES := -isystemexternal/include -isystemexternal/include/ftxui -isystemexternal/include/sdl/linux -isystemexternal/include/id3v2
+  LIBRARIES := -Lexternal/library/ftxui/linux -Lexternal/library/sdl/linux -Lexternal/library/id3v2/linux -static-libstdc++ -static-libgcc -ldl -lm -lc -lpthread -lftxui-component -lftxui-dom -lftxui-screen -lSDL2 -lSDL2_mixer -lid3v2lib -Wl,-rpath,'$$ORIGIN'
 endif
