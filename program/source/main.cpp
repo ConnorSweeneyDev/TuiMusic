@@ -1,4 +1,6 @@
 #include <cstdlib>
+#include <fileref.h>
+#include <filesystem>
 #include <iostream>
 #include <string>
 
@@ -6,33 +8,14 @@
 #include "SDL_error.h"
 #include "SDL_main.h"
 #include "SDL_mixer.h"
-#include "component/component.hpp"
-#include "component/component_options.hpp"
-#include "dom/deprecated.hpp"
-#include "dom/elements.hpp"
-#include "dom/node.hpp"
-#include "fileref.h"
-#include "screen/color.hpp"
-#include "screen/screen.hpp"
-#include "tstring.h"
-
-ftxui::ButtonOption Style()
-{
-  auto option = ftxui::ButtonOption::Animated();
-  option.transform = [](const ftxui::EntryState &s)
-  {
-    auto element = ftxui::text(s.label);
-    if (s.focused) { element |= ftxui::bold; }
-    return element | ftxui::center | ftxui::borderEmpty | ftxui::flex;
-  };
-  return option;
-}
+#include "SDL_timer.h"
+#include "taglib/tstring.h"
 
 int main(int argc, char *argv[])
 {
-  if (argc > 1 || argv[1] != nullptr)
+  if (argc > 1)
   {
-    std::cout << "No arguments are supported.\n";
+    std::cout << "Usage: " << argv[0] << std::endl;
     return EXIT_FAILURE;
   }
 
@@ -41,52 +24,45 @@ int main(int argc, char *argv[])
     std::cout << "SDL_Init Error: " << SDL_GetError() << std::endl;
     exit(1);
   }
-  if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
+  if (Mix_Init(MIX_INIT_MP3) == 0)
+  {
+    std::cout << "Mix_Init Error: " << Mix_GetError() << std::endl;
+    exit(1);
+  }
+  if (Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 2048) != 0)
   {
     std::cout << "Mix_OpenAudio Error: " << Mix_GetError() << std::endl;
     exit(1);
   }
-  Mix_CloseAudio();
-  Mix_Quit();
-  SDL_Quit();
 
-  // WINDOWS
-  std::string file_name = "D:/CPP/TuiMusic/7 - Prince.mp3";
-  // LINUX
-  // std::string file_name = "/mnt/d/CPP/TuiMusic/7 - Prince.mp3";
-  TagLib::FileRef file(file_name.c_str());
+  std::filesystem::path song = std::filesystem::current_path() / "7 - Prince.mp3";
+  Mix_Music *music = Mix_LoadMUS(song.string().c_str());
+  if (music == nullptr)
+  {
+    std::cout << "Mix_LoadMUS Error: " << song << ": " << Mix_GetError() << std::endl;
+    exit(1);
+  }
+  Mix_VolumeMusic(MIX_MAX_VOLUME / 10);
+  Mix_PlayMusic(music, 0);
+  TagLib::FileRef file(song.string().c_str());
+  if (file.isNull())
+  {
+    std::cout << "TagLib::FileRef Error: \"" << song << "\" could not be loaded." << std::endl;
+    exit(1);
+  }
   TagLib::String title_tag = file.tag()->title();
   std::string title_str = title_tag.to8Bit(true);
   TagLib::String artist_tag = file.tag()->artist();
   std::string artist_str = artist_tag.to8Bit(true);
-  std::cout << title_str << std::endl;
-  std::cout << artist_str << std::endl;
+  std::cout << "Playing: " << title_str << " - " << artist_str << std::endl;
 
-  auto summary = [&]
-  {
-    auto content = ftxui::vbox({
-      ftxui::hbox({ftxui::text("- " + title_str + ":   "), ftxui::text("3") | ftxui::bold}) |
-        color(ftxui::Color::Green),
-      ftxui::hbox({ftxui::text("- " + artist_str + ": "), ftxui::text("2") | ftxui::bold}) |
-        color(ftxui::Color::RedLight),
-    });
-    return window(ftxui::text(L" Summary "), content);
-  };
+  while (Mix_PlayingMusic()) { SDL_Delay(100); }
 
-  auto document = ftxui::vbox({
-    ftxui::hbox({
-      summary(),
-      summary(),
-      summary() | ftxui::flex,
-    }),
-    summary(),
-    summary(),
-  });
-  document = document | size(ftxui::WIDTH, ftxui::LESS_THAN, 80);
+  Mix_FreeMusic(music);
+  music = nullptr;
+  Mix_CloseAudio();
+  Mix_Quit();
+  SDL_Quit();
 
-  auto screen = ftxui::Screen::Create(ftxui::Dimension::Full(), ftxui::Dimension::Fit(document));
-  Render(screen, document);
-
-  std::cout << screen.ToString() << '\0' << std::endl;
   return EXIT_SUCCESS;
 }
