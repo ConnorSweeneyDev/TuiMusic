@@ -5,20 +5,21 @@
 #include <string>
 #include <vector>
 
-#include "D:/CPP/TuiMusic/external/include/ftxui/screen/screen.hpp"
 #include "SDL.h"
 #include "SDL_error.h"
 #include "SDL_main.h"
 #include "SDL_mixer.h"
 #include "SDL_timer.h"
+#include "fileref.h"
 #include "ftxui/component/component.hpp"
 #include "ftxui/component/component_base.hpp"
 #include "ftxui/component/component_options.hpp"
 #include "ftxui/component/loop.hpp"
 #include "ftxui/component/screen_interactive.hpp"
 #include "ftxui/dom/elements.hpp"
+#include "ftxui/screen/screen.hpp"
 #include "ftxui/util/ref.hpp"
-#include "id3v2lib.compat.h"
+#include "taglib/tstring.h"
 
 int main(int argc, char *argv[])
 {
@@ -54,18 +55,16 @@ int main(int argc, char *argv[])
   Mix_VolumeMusic(MIX_MAX_VOLUME / 10);
   Mix_PlayMusic(music, 0);
 
-  ID3v2_tag *song_tag = load_tag(song.string().c_str());
-  if (song_tag == nullptr)
+  TagLib::FileRef file(song.string().c_str());
+  if (file.isNull())
   {
-    std::cout << "load_tag Error: \"" << song << "\": Could not read tags." << std::endl;
-    exit(EXIT_FAILURE);
+    std::cout << "FileRef Error: \"" << song << "\" could not be loaded." << std::endl;
+    exit(1);
   }
-  ID3v2_frame *title_frame = tag_get_title(song_tag);
-  ID3v2_frame_text_content *title_content = parse_text_frame_content(title_frame);
-  std::string title = title_content->data;
-  ID3v2_frame *artist_frame = tag_get_artist(song_tag);
-  ID3v2_frame_text_content *artist_content = parse_text_frame_content(artist_frame);
-  std::string artist = artist_content->data;
+  TagLib::String title_tag = file.tag()->title();
+  std::string title = title_tag.to8Bit(true);
+  TagLib::String artist_tag = file.tag()->artist();
+  std::string artist = artist_tag.to8Bit(true);
 
   auto screen = ftxui::ScreenInteractive::Fullscreen();
   ftxui::Screen::Cursor cursor;
