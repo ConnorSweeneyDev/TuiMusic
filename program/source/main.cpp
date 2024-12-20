@@ -1,14 +1,23 @@
+#include <cctype>
 #include <cstdlib>
 #include <fileref.h>
 #include <filesystem>
 #include <iostream>
 #include <string>
+#include <vector>
 
 #include "SDL.h"
 #include "SDL_error.h"
 #include "SDL_main.h"
 #include "SDL_mixer.h"
 #include "SDL_timer.h"
+#include "ftxui/component/component.hpp"
+#include "ftxui/component/component_base.hpp"
+#include "ftxui/component/component_options.hpp"
+#include "ftxui/component/loop.hpp"
+#include "ftxui/component/screen_interactive.hpp"
+#include "ftxui/dom/elements.hpp"
+#include "ftxui/util/ref.hpp"
 #include "taglib/tstring.h"
 
 int main(int argc, char *argv[])
@@ -39,7 +48,7 @@ int main(int argc, char *argv[])
   Mix_Music *music = Mix_LoadMUS(song.string().c_str());
   if (music == nullptr)
   {
-    std::cout << "Mix_LoadMUS Error: " << song << ": " << Mix_GetError() << std::endl;
+    std::cout << "Mix_LoadMUS Error: \"" << song << "\": " << Mix_GetError() << std::endl;
     exit(1);
   }
   Mix_VolumeMusic(MIX_MAX_VOLUME / 10);
@@ -47,16 +56,54 @@ int main(int argc, char *argv[])
   TagLib::FileRef file(song.string().c_str());
   if (file.isNull())
   {
-    std::cout << "TagLib::FileRef Error: \"" << song << "\" could not be loaded." << std::endl;
+    std::cout << "FileRef Error: \"" << song << "\" could not be loaded." << std::endl;
     exit(1);
   }
   TagLib::String title_tag = file.tag()->title();
-  std::string title_str = title_tag.to8Bit(true);
+  std::string title = title_tag.to8Bit(true);
   TagLib::String artist_tag = file.tag()->artist();
-  std::string artist_str = artist_tag.to8Bit(true);
-  std::cout << "Playing: " << title_str << " - " << artist_str << std::endl;
+  std::string artist = artist_tag.to8Bit(true);
+  std::cout << "Playing: " << title << " - " << artist << std::endl;
 
-  while (Mix_PlayingMusic()) { SDL_Delay(100); }
+  auto screen = ftxui::ScreenInteractive::Fullscreen();
+
+  std::vector<std::string> entries = {title + " - " + artist, "test"};
+  int selected = 0;
+  ftxui::MenuOption menu_option;
+  menu_option.on_enter = screen.ExitLoopClosure();
+  ftxui::Component song_list = Menu(&entries, &selected, menu_option);
+
+  auto container = ftxui::Container::Vertical({
+    song_list,
+  });
+
+  auto renderer = Renderer(container,
+                           [&]
+                           {
+                             return ftxui::hbox({
+                                      song_list->Render(),
+                                      ftxui::separator(),
+                                    }) |
+                                    ftxui::border;
+                           });
+  renderer |= ftxui::CatchEvent(
+    [&](ftxui::Event event)
+    {
+      if (event == ftxui::Event::Character('q'))
+      {
+        screen.ExitLoopClosure()();
+        return true;
+      }
+      return false;
+    });
+
+  ftxui::Loop loop(&screen, renderer);
+  while (!loop.HasQuitted())
+  {
+    if (!Mix_PlayingMusic()) { break; }
+    loop.RunOnce();
+    SDL_Delay(10);
+  }
 
   Mix_FreeMusic(music);
   music = nullptr;
