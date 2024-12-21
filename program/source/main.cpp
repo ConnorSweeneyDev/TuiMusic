@@ -73,26 +73,10 @@ int main(int argc, char *argv[])
 
   std::vector<std::string> entries = {title + " - " + artist};
   for (int i = 0; i <= 49; i++) entries.push_back("test" + std::to_string(i));
-  entries.push_back("verylonglonglongtest50");
+  entries.push_back("veryveryverylongtest50");
   int selected = 0;
-  ftxui::MenuOption menu_option;
-  menu_option.on_enter = screen.ExitLoopClosure();
-  ftxui::Component song_list = Menu(&entries, &selected, menu_option);
-
-  auto container = ftxui::Container::Vertical({
-    song_list,
-  });
-
-  auto renderer = Renderer(container,
-                           [&]
-                           {
-                             return ftxui::hbox({
-                                      song_list->Render() | ftxui::yframe,
-                                      ftxui::separator(),
-                                    }) |
-                                    ftxui::border;
-                           });
-  renderer |= ftxui::CatchEvent(
+  ftxui::Component song_list = ftxui::Menu(&entries, &selected, ftxui::MenuOption::Vertical()) | ftxui::yframe;
+  song_list |= ftxui::CatchEvent(
     [&](ftxui::Event event)
     {
       if (event == ftxui::Event::Character('q'))
@@ -103,10 +87,59 @@ int main(int argc, char *argv[])
       return false;
     });
 
+  std::string search_term = "";
+  ftxui::Component song_search = ftxui::Input(&search_term, "Search", ftxui::InputOption::Default());
+
+  ftxui::Component song_container = ftxui::Container::Vertical({song_search, song_list});
+  song_container |= ftxui::CatchEvent(
+    [&](ftxui::Event event)
+    {
+      if (event == ftxui::Event::Escape)
+      {
+        screen.ExitLoopClosure()();
+        return true;
+      }
+      if (event == ftxui::Event::Tab)
+      {
+        if (song_search->Focused())
+        {
+          song_list->TakeFocus();
+          return true;
+        }
+        if (song_list->Focused())
+        {
+          song_search->TakeFocus();
+          return true;
+        }
+      }
+      return false;
+    });
+  ftxui::Component renderer = Renderer(song_container,
+                                       [&]
+                                       {
+                                         return ftxui::hbox({
+                                                  ftxui::vbox({
+                                                    ftxui::hbox({
+                                                      ftxui::separatorEmpty(),
+                                                      song_search->Render(),
+                                                      ftxui::separatorEmpty(),
+                                                    }),
+                                                    ftxui::separatorHeavy(),
+                                                    ftxui::hbox({
+                                                      ftxui::separatorEmpty(),
+                                                      song_list->Render() | ftxui::yframe,
+                                                      ftxui::separatorEmpty(),
+                                                    }),
+                                                  }),
+                                                  ftxui::separatorHeavy(),
+                                                }) |
+                                                ftxui::borderHeavy;
+                                       });
+
   ftxui::Loop loop(&screen, renderer);
   while (!loop.HasQuitted())
   {
-    if (!Mix_PlayingMusic()) { break; }
+    if (!Mix_PlayingMusic()) { screen.ExitLoopClosure()(); }
     loop.RunOnce();
     SDL_Delay(10);
   }
