@@ -76,8 +76,8 @@ int main(int argc, char *argv[])
   app_screen.SetCursor(app_cursor);
 
   std::vector<std::string> play_list_entries = {};
-  for (int i = 0; i <= 5; i++) play_list_entries.push_back("playlist" + std::to_string(i));
-  play_list_entries.push_back("verylongplaylist6");
+  for (int i = 0; i <= 49; i++) play_list_entries.push_back("playlist" + std::to_string(i));
+  play_list_entries.push_back("verylongplaylist50");
   int max_play_list_width = 0;
   for (std::string play_list_entry : play_list_entries)
     if ((int)play_list_entry.length() > max_play_list_width) max_play_list_width = (int)play_list_entry.length();
@@ -87,8 +87,7 @@ int main(int argc, char *argv[])
   play_list_option.focused_entry = ftxui::Ref<int>(&selected_play_list);
   ftxui::Component play_list = ftxui::Menu(&play_list_entries, &selected_play_list, play_list_option);
   ftxui::Component play_list_renderer = ftxui::Renderer(
-    play_list, [&]
-    { return ftxui::hbox({ftxui::separatorEmpty(), play_list->Render() | ftxui::yframe, ftxui::separatorEmpty()}); });
+    play_list, [&] { return ftxui::hbox({ftxui::separatorEmpty(), play_list->Render(), ftxui::separatorEmpty()}); });
   int play_list_width = -1;
 
   int selected_song = 0;
@@ -96,8 +95,7 @@ int main(int argc, char *argv[])
   song_list_option.focused_entry = ftxui::Ref<int>(&selected_song);
   ftxui::Component song_list = ftxui::Menu(&song_list_entries, &selected_song, song_list_option);
   ftxui::Component song_list_renderer = ftxui::Renderer(
-    song_list, [&]
-    { return ftxui::hbox({ftxui::separatorEmpty(), song_list->Render() | ftxui::yframe, ftxui::separatorEmpty()}); });
+    song_list, [&] { return ftxui::hbox({ftxui::separatorEmpty(), song_list->Render(), ftxui::separatorEmpty()}); });
   std::string playing_song = "None";
   bool song_paused = false;
   int volume = 10;
@@ -169,7 +167,8 @@ int main(int argc, char *argv[])
       return false;
     });
 
-  ftxui::Component app_container = ftxui::ResizableSplitLeft(play_list, song_list, &play_list_width);
+  ftxui::Component app_container =
+    ftxui::ResizableSplitLeft(play_list | ftxui::yframe, song_list | ftxui::yframe, &play_list_width);
   app_container |= ftxui::CatchEvent(
     [&](ftxui::Event event)
     {
@@ -249,7 +248,7 @@ int main(int argc, char *argv[])
                             ftxui::text("┃ Vol: " + std::to_string(volume) +
                                         (volume < 100 ? ((volume < 10) ? "  " : " ") : ""))}),
                ftxui::separator(),
-               ftxui::hbox({app_container->Render()}),
+               app_container->Render(),
              }) |
              ftxui::borderEmpty;
     });
