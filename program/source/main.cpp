@@ -86,16 +86,12 @@ int main(int argc, char *argv[])
   ftxui::MenuOption play_list_option = ftxui::MenuOption::Vertical();
   play_list_option.focused_entry = ftxui::Ref<int>(&selected_play_list);
   ftxui::Component play_list = ftxui::Menu(&play_list_entries, &selected_play_list, play_list_option);
-  ftxui::Component play_list_renderer = ftxui::Renderer(
-    play_list, [&] { return ftxui::hbox({ftxui::separatorEmpty(), play_list->Render(), ftxui::separatorEmpty()}); });
   int play_list_width = -1;
 
   int selected_song = 0;
   ftxui::MenuOption song_list_option = ftxui::MenuOption::Vertical();
   song_list_option.focused_entry = ftxui::Ref<int>(&selected_song);
   ftxui::Component song_list = ftxui::Menu(&song_list_entries, &selected_song, song_list_option);
-  ftxui::Component song_list_renderer = ftxui::Renderer(
-    song_list, [&] { return ftxui::hbox({ftxui::separatorEmpty(), song_list->Render(), ftxui::separatorEmpty()}); });
   std::string playing_song = "None";
   bool song_paused = false;
   int volume = 10;
