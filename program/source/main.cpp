@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
     if (entry.is_regular_file() && entry.path().extension() == ".mp3") songs.push_back(entry.path());
 
   Mix_Music *music = nullptr;
-  std::vector<std::string> song_entries = {};
+  std::vector<std::string> song_list_entries = {};
   for (std::filesystem::path song : songs)
   {
     TagLib::FileRef file(song.string().c_str());
@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
     std::string title = title_tag.to8Bit(true);
     TagLib::String artist_tag = file.tag()->artist();
     std::string artist = artist_tag.to8Bit(true);
-    song_entries.push_back(title + " ┃ " + artist);
+    song_list_entries.push_back(title + " ┃ " + artist);
   }
 
   ftxui::ScreenInteractive app_screen = ftxui::ScreenInteractive::Fullscreen();
@@ -75,21 +75,26 @@ int main(int argc, char *argv[])
   app_cursor.shape = ftxui::Screen::Cursor::Hidden;
   app_screen.SetCursor(app_cursor);
 
-  std::vector<std::string> playlist_entries = {};
-  for (int i = 0; i <= 5; i++) playlist_entries.push_back("playlist" + std::to_string(i));
-  playlist_entries.push_back("verylongplaylist6");
+  std::vector<std::string> play_list_entries = {};
+  for (int i = 0; i <= 5; i++) play_list_entries.push_back("playlist" + std::to_string(i));
+  play_list_entries.push_back("verylongplaylist6");
+  int max_play_list_width = 0;
+  for (std::string play_list_entry : play_list_entries)
+    if ((int)play_list_entry.length() > max_play_list_width) max_play_list_width = (int)play_list_entry.length();
+  max_play_list_width += 3;
   int selected_play_list = 0;
   ftxui::MenuOption play_list_option = ftxui::MenuOption::Vertical();
   play_list_option.focused_entry = ftxui::Ref<int>(&selected_play_list);
-  ftxui::Component play_list = ftxui::Menu(&playlist_entries, &selected_play_list, play_list_option);
+  ftxui::Component play_list = ftxui::Menu(&play_list_entries, &selected_play_list, play_list_option);
   ftxui::Component play_list_renderer = ftxui::Renderer(
     play_list, [&]
     { return ftxui::hbox({ftxui::separatorEmpty(), play_list->Render() | ftxui::yframe, ftxui::separatorEmpty()}); });
+  int play_list_width = -1;
 
   int selected_song = 0;
   ftxui::MenuOption song_list_option = ftxui::MenuOption::Vertical();
   song_list_option.focused_entry = ftxui::Ref<int>(&selected_song);
-  ftxui::Component song_list = ftxui::Menu(&song_entries, &selected_song, song_list_option);
+  ftxui::Component song_list = ftxui::Menu(&song_list_entries, &selected_song, song_list_option);
   ftxui::Component song_list_renderer = ftxui::Renderer(
     song_list, [&]
     { return ftxui::hbox({ftxui::separatorEmpty(), song_list->Render() | ftxui::yframe, ftxui::separatorEmpty()}); });
@@ -118,11 +123,6 @@ int main(int argc, char *argv[])
       if (event == ftxui::Event::CtrlU)
       {
         selected_play_list -= 12;
-        return true;
-      }
-      if (event == ftxui::Event::AltL)
-      {
-        song_list->TakeFocus();
         return true;
       }
       return false;
@@ -163,18 +163,13 @@ int main(int argc, char *argv[])
         }
         Mix_VolumeMusic(volume * (MIX_MAX_VOLUME / 100));
         Mix_PlayMusic(music, 0);
-        playing_song = song_entries[(size_t)selected_song];
+        playing_song = song_list_entries[(size_t)selected_song];
         song_paused = false;
-      }
-      if (event == ftxui::Event::AltH)
-      {
-        play_list->TakeFocus();
-        return true;
       }
       return false;
     });
 
-  ftxui::Component app_container = ftxui::Container::Horizontal({play_list, song_list});
+  ftxui::Component app_container = ftxui::ResizableSplitLeft(play_list, song_list, &play_list_width);
   app_container |= ftxui::CatchEvent(
     [&](ftxui::Event event)
     {
@@ -215,15 +210,32 @@ int main(int argc, char *argv[])
         Mix_VolumeMusic(volume * (MIX_MAX_VOLUME / 100));
         return true;
       }
+      if (event == ftxui::Event::AltP)
+      {
+        if (play_list_width == -1)
+        {
+          play_list_width = max_play_list_width;
+          play_list->TakeFocus();
+        }
+        else
+        {
+          play_list_width = -1;
+          song_list->TakeFocus();
+        }
+        return true;
+      }
       if (event == ftxui::Event::Escape)
       {
         app_screen.ExitLoopClosure()();
         return true;
       }
+      if (event == ftxui::Event::h) return true;
+      if (event == ftxui::Event::l) return true;
       if (event.mouse().motion == ftxui::Mouse::Motion::Moved) return true;
       if (event.mouse().motion == ftxui::Mouse::Motion::Pressed) return true;
       return false;
     });
+
   ftxui::Component app_renderer = ftxui::Renderer(
     app_container,
     [&]
@@ -237,11 +249,12 @@ int main(int argc, char *argv[])
                             ftxui::text("┃ Vol: " + std::to_string(volume) +
                                         (volume < 100 ? ((volume < 10) ? "  " : " ") : ""))}),
                ftxui::separator(),
-               ftxui::hbox({play_list_renderer->Render(), ftxui::separator(), song_list_renderer->Render()}),
+               ftxui::hbox({app_container->Render()}),
              }) |
              ftxui::borderEmpty;
     });
 
+  song_list->TakeFocus();
   ftxui::Loop app_loop(&app_screen, app_renderer);
   while (!app_loop.HasQuitted())
   {
