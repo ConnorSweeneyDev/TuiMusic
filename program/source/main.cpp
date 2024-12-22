@@ -71,26 +71,93 @@ int main(int argc, char *argv[])
   cursor.shape = ftxui::Screen::Cursor::Hidden;
   screen.SetCursor(cursor);
 
-  std::vector<std::string> entries = {title + " - " + artist};
-  for (int i = 0; i <= 49; i++) entries.push_back("test" + std::to_string(i));
-  entries.push_back("veryveryverylongtest50");
-  int selected = 0;
-  ftxui::Component song_list = ftxui::Menu(&entries, &selected, ftxui::MenuOption::Vertical()) | ftxui::yframe;
+  std::vector<std::string> playlist_entries = {};
+  for (int i = 0; i <= 5; i++) playlist_entries.push_back("playlist" + std::to_string(i));
+  playlist_entries.push_back("veryveryverylongplaylist6");
+  int selected_play_list = 0;
+  ftxui::MenuOption play_list_option = ftxui::MenuOption::Vertical();
+  play_list_option.focused_entry = ftxui::Ref<int>(&selected_play_list);
+  ftxui::Component play_list = ftxui::Menu(&playlist_entries, &selected_play_list, play_list_option);
+  ftxui::Component play_list_renderer = Renderer(
+    play_list, [&]
+    { return ftxui::hbox({ftxui::separatorEmpty(), play_list->Render() | ftxui::yframe, ftxui::separatorEmpty()}); });
+
+  std::vector<std::string> song_entries = {title + " - " + artist};
+  for (int i = 0; i <= 49; i++) song_entries.push_back("song" + std::to_string(i));
+  song_entries.push_back("veryveryverylongsong50");
+  int selected_song = 0;
+  ftxui::MenuOption song_list_option = ftxui::MenuOption::Vertical();
+  song_list_option.focused_entry = ftxui::Ref<int>(&selected_song);
+  ftxui::Component song_list = ftxui::Menu(&song_entries, &selected_song, song_list_option);
+  ftxui::Component song_list_renderer = Renderer(
+    song_list, [&]
+    { return ftxui::hbox({ftxui::separatorEmpty(), song_list->Render() | ftxui::yframe, ftxui::separatorEmpty()}); });
+
+  play_list |= ftxui::CatchEvent(
+    [&](ftxui::Event event)
+    {
+      if (event == ftxui::Event::j)
+      {
+        selected_play_list++;
+        return true;
+      }
+      if (event == ftxui::Event::k)
+      {
+        selected_play_list--;
+        return true;
+      }
+      if (event == ftxui::Event::CtrlD)
+      {
+        selected_play_list += 12;
+        return true;
+      }
+      if (event == ftxui::Event::CtrlU)
+      {
+        selected_play_list -= 12;
+        return true;
+      }
+      if (event == ftxui::Event::AltL)
+      {
+        song_list->TakeFocus();
+        return true;
+      }
+      return false;
+    });
   song_list |= ftxui::CatchEvent(
     [&](ftxui::Event event)
     {
-      if (event == ftxui::Event::Character('q'))
+      if (event == ftxui::Event::j)
       {
-        screen.ExitLoopClosure()();
+        selected_song++;
+        return true;
+      }
+      if (event == ftxui::Event::k)
+      {
+        selected_song--;
+        return true;
+      }
+      if (event == ftxui::Event::CtrlD)
+      {
+        selected_song += 12;
+        return true;
+      }
+      if (event == ftxui::Event::CtrlU)
+      {
+        selected_song -= 12;
+        return true;
+      }
+      if (event == ftxui::Event::AltH)
+      {
+        play_list->TakeFocus();
         return true;
       }
       return false;
     });
 
-  std::string search_term = "";
-  ftxui::Component song_search = ftxui::Input(&search_term, "Search", ftxui::InputOption::Default());
-
-  ftxui::Component song_container = ftxui::Container::Vertical({song_search, song_list});
+  ftxui::Component song_container = ftxui::Container::Vertical({
+    play_list,
+    song_list,
+  });
   song_container |= ftxui::CatchEvent(
     [&](ftxui::Event event)
     {
@@ -99,42 +166,15 @@ int main(int argc, char *argv[])
         screen.ExitLoopClosure()();
         return true;
       }
-      if (event == ftxui::Event::Tab)
-      {
-        if (song_search->Focused())
-        {
-          song_list->TakeFocus();
-          return true;
-        }
-        if (song_list->Focused())
-        {
-          song_search->TakeFocus();
-          return true;
-        }
-      }
       return false;
     });
-  ftxui::Component renderer = Renderer(song_container,
-                                       [&]
-                                       {
-                                         return ftxui::hbox({
-                                                  ftxui::vbox({
-                                                    ftxui::hbox({
-                                                      ftxui::separatorEmpty(),
-                                                      song_search->Render(),
-                                                      ftxui::separatorEmpty(),
-                                                    }),
-                                                    ftxui::separatorHeavy(),
-                                                    ftxui::hbox({
-                                                      ftxui::separatorEmpty(),
-                                                      song_list->Render() | ftxui::yframe,
-                                                      ftxui::separatorEmpty(),
-                                                    }),
-                                                  }),
-                                                  ftxui::separatorHeavy(),
-                                                }) |
-                                                ftxui::borderHeavy;
-                                       });
+  ftxui::Component renderer =
+    Renderer(song_container,
+             [&]
+             {
+               return ftxui::hbox({play_list_renderer->Render(), ftxui::separator(), song_list_renderer->Render()}) |
+                      ftxui::borderHeavy;
+             });
 
   ftxui::Loop loop(&screen, renderer);
   while (!loop.HasQuitted())
