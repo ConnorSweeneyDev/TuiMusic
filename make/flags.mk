@@ -9,7 +9,7 @@ WARNINGS := -Wall -Wextra -Wpedantic -Wconversion -Wshadow -Wundef -Wclobbered -
 INCLUDES := -Iprogram/include
 ifeq ($(UNAME), Windows)
   SYSTEM_INCLUDES := -isystemexternal/include -isystemexternal/include/ftxui -isystemexternal/include/sdl/windows -isystemexternal/include/taglib
-  LIBRARIES := -Lexternal/library/ftxui/windows -Lexternal/library/sdl/windows -Lexternal/library/taglib/windows -static -Wl,-Bstatic -lgcc -lstdc++ -lssp -lwinpthread -Wl,-Bdynamic -lftxui-component -lftxui-dom -lftxui-screen -lmingw32 -lSDL2main -lSDL2 -lSDL2_mixer -ltag
+  LIBRARIES := -Lexternal/library/ftxui/windows -Lexternal/library/sdl/windows -Lexternal/library/taglib/windows -static -Wl,-Bstatic -lgcc -lstdc++ -lssp -lwinpthread -Wl,-Bdynamic -lftxui-component -lftxui-dom -lftxui-screen -lSDL2 -lSDL2_mixer -ltag
 else ifeq ($(UNAME), Linux)
   SYSTEM_INCLUDES := -isystemexternal/include -isystemexternal/include/ftxui -isystemexternal/include/sdl/linux -isystemexternal/include/taglib
   LIBRARIES := -Lexternal/library/ftxui/linux -Lexternal/library/sdl/linux -Lexternal/library/taglib/linux -static-libstdc++ -static-libgcc -ldl -lm -lc -lpthread -lftxui-component -lftxui-dom -lftxui-screen -lSDL2 -lSDL2_mixer -ltag -Wl,-rpath,'$$ORIGIN'

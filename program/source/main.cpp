@@ -1,3 +1,5 @@
+#define SDL_MAIN_HANDLED
+
 #include <cctype>
 #include <cmath>
 #include <component/event.hpp>
@@ -9,7 +11,6 @@
 
 #include "SDL.h"
 #include "SDL_error.h"
-#include "SDL_main.h"
 #include "SDL_mixer.h"
 #include "SDL_timer.h"
 #include "ftxui/component/component.hpp"
@@ -24,14 +25,10 @@
 #include "taglib/fileref.h"
 #include "taglib/tstring.h"
 
-int main(int argc, char *argv[])
-{
-  if (argc > 1)
-  {
-    std::cout << "Usage: " << argv[0] << std::endl;
-    return EXIT_FAILURE;
-  }
+#include "main.hpp"
 
+int main()
+{
   if (SDL_Init(SDL_INIT_AUDIO) != 0)
   {
     std::cout << "SDL_Init Error: " << SDL_GetError() << std::endl;
