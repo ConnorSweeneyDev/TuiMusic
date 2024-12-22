@@ -187,6 +187,22 @@ int main(int argc, char *argv[])
         song_paused = !song_paused;
         return true;
       }
+      if (event == ftxui::Event::L)
+      {
+        double new_position = Mix_GetMusicPosition(music) + Mix_MusicDuration(music) / 20;
+        if (new_position > Mix_MusicDuration(music))
+          Mix_SetMusicPosition(Mix_MusicDuration(music));
+        else
+          Mix_SetMusicPosition(new_position);
+      }
+      if (event == ftxui::Event::H)
+      {
+        double new_position = Mix_GetMusicPosition(music) - Mix_MusicDuration(music) / 20;
+        if (new_position < 0)
+          Mix_SetMusicPosition(0);
+        else
+          Mix_SetMusicPosition(new_position);
+      }
       if (event == ftxui::Event::U)
       {
         if (volume < 100) volume++;
