@@ -29,6 +29,7 @@ namespace tuim::application
   inline std::shared_ptr<Playlist> current_song_playlist = nullptr;
   inline std::string current_song_display = "None";
   inline int volume = 10;
+  inline float volume_modifier = 1.0f;
   inline bool paused = false;
 
   void initialize_playlists();

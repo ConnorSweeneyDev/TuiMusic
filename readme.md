@@ -17,12 +17,13 @@ Do the following to ensure your environment is set up correctly:
 - Download a 64-bit [MinGW](https://winlibs.com/) distribution with Clang/LLVM support and put the `[DISTRIBUTION]/bin`
   directory in your path.
 - Install GNUMake by running `winget install ezwinports.make`.
+- Install ffmpeg by running `winget install Gyan.FFmpeg`.
 - Ensure that you have `[GIT_INSTALLATION]/bin` in your path.
 
 ### Linux
 Do the following on Ubuntu to ensure your environment is set up correctly:
 - Only run `sudo apt update && sudo apt upgrade` if you haven't already.
-- Run `sudo apt install git g++ gdb make`.
+- Run `sudo apt install git g++ gdb make ffmpeg`.
 
 After building, do the following to ensure your environment is set up correctly:
 - Only run `sudo apt install alsa xorg openbox` if you don't already have an audio and window manager.

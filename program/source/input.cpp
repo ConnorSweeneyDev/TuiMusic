@@ -1,6 +1,12 @@
+#include <cmath>
 #include <cstddef>
+#include <cstdio>
 #include <cstdlib>
 #include <iostream>
+#include <memory>
+#include <regex>
+#include <stdio.h>
+#include <string>
 
 #include "SDL_mixer.h"
 
@@ -64,7 +70,41 @@ namespace tuim::input
         std::cout << "Mix_LoadMUS Error: " << new_song.path << ": " << Mix_GetError() << std::endl;
         exit(EXIT_FAILURE);
       }
-      Mix_VolumeMusic(application::volume * (MIX_MAX_VOLUME / 100));
+
+      std::string command =
+        "ffmpeg -i \"" + new_song.path.string() + "\" -filter:a volumedetect -f null /dev/null 2>&1";
+      std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(command.c_str(), "r"), pclose);
+      if (!pipe)
+      {
+        std::cout << "Failed to open pipe!" << std::endl;
+        exit(EXIT_FAILURE);
+      }
+      float decibels = -14.0f;
+      std::string ffmpeg_output;
+      char buffer[128];
+      while (fgets(buffer, sizeof(buffer), pipe.get()) != nullptr) ffmpeg_output += buffer;
+      pipe.reset();
+      std::regex ffmpeg_regex("mean_volume: -?[0-9]+.[0-9]+");
+      std::smatch ffmpeg_match;
+      if (std::regex_search(ffmpeg_output, ffmpeg_match, ffmpeg_regex))
+      {
+        ffmpeg_output = ffmpeg_match[0];
+        std::regex decibels_regex("-?[0-9]+.[0-9]+");
+        std::smatch decibels_match;
+        if (std::regex_search(ffmpeg_output, decibels_match, decibels_regex))
+          decibels = std::stof(decibels_match[0]);
+        else
+          decibels = -14.0f;
+      }
+      else
+        decibels = -14.0f;
+      application::volume_modifier = decibels / -14.0f;
+      float real_volume =
+        std::round(((float)application::volume * (MIX_MAX_VOLUME / 100.0f)) * application::volume_modifier);
+      if (real_volume > MIX_MAX_VOLUME) real_volume = MIX_MAX_VOLUME;
+      if (real_volume < 0) real_volume = 0;
+      Mix_VolumeMusic((int)real_volume);
+
       Mix_PlayMusic(application::current_song, 0);
       application::current_song_display = interface::song_menu_entries[(size_t)interface::hovered_song];
       application::paused = false;
@@ -116,7 +156,11 @@ namespace tuim::input
   {
     application::volume += amount;
     if (application::volume > 100) application::volume = 100;
-    Mix_VolumeMusic(application::volume * (MIX_MAX_VOLUME / 100));
+    float real_volume =
+      std::round(((float)application::volume * (MIX_MAX_VOLUME / 100.0f)) * application::volume_modifier);
+    if (real_volume > MIX_MAX_VOLUME) real_volume = MIX_MAX_VOLUME;
+    if (real_volume < 0) real_volume = 0;
+    Mix_VolumeMusic((int)real_volume);
     return true;
   }
 
@@ -124,7 +168,11 @@ namespace tuim::input
   {
     application::volume -= amount;
     if (application::volume < 0) application::volume = 0;
-    Mix_VolumeMusic(application::volume * (MIX_MAX_VOLUME / 100));
+    float real_volume =
+      std::round(((float)application::volume * (MIX_MAX_VOLUME / 100.0f)) * application::volume_modifier);
+    if (real_volume > MIX_MAX_VOLUME) real_volume = MIX_MAX_VOLUME;
+    if (real_volume < 0) real_volume = 0;
+    Mix_VolumeMusic((int)real_volume);
     return true;
   }
 
