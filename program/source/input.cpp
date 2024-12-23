@@ -23,7 +23,7 @@ namespace tuim::input
     if (is_song)
     {
       interface::hovered_song += amount;
-      application::playlists[(size_t)application::current_playlist]->hovered_song = interface::hovered_song;
+      application::playlists[(size_t)application::current_playlist_index]->hovered_song = interface::hovered_song;
     }
     else
       interface::hovered_playlist += amount;
@@ -35,7 +35,7 @@ namespace tuim::input
     if (is_song)
     {
       interface::hovered_song -= amount;
-      application::playlists[(size_t)application::current_playlist]->hovered_song = interface::hovered_song;
+      application::playlists[(size_t)application::current_playlist_index]->hovered_song = interface::hovered_song;
     }
     else
       interface::hovered_playlist -= amount;
@@ -61,11 +61,12 @@ namespace tuim::input
   {
     if (is_song)
     {
-      application::current_song_playlist = application::playlists[(size_t)application::current_playlist];
+      application::current_song_playlist = application::playlists[(size_t)application::current_playlist_index];
       Mix_FreeMusic(application::current_song);
       application::current_song = nullptr;
-      application::Song &new_song =
-        application::playlists[(size_t)application::current_playlist]->songs[(size_t)interface::hovered_song];
+      application::current_song_index = interface::hovered_song;
+      application::Song &new_song = application::playlists[(size_t)application::current_playlist_index]
+                                      ->songs[(size_t)application::current_song_index];
       application::current_song = Mix_LoadMUS(new_song.path.string().c_str());
       if (application::current_song == nullptr)
       {
@@ -87,11 +88,17 @@ namespace tuim::input
     }
     else
     {
-      application::current_playlist = interface::hovered_playlist;
-      interface::hovered_song = application::playlists[(size_t)application::current_playlist]->hovered_song;
+      application::current_playlist_index = interface::hovered_playlist;
+      interface::hovered_song = application::playlists[(size_t)application::current_playlist_index]->hovered_song;
       interface::song_menu_entries.clear();
-      for (auto &song : application::playlists[(size_t)application::current_playlist]->songs)
+      for (auto &song : application::playlists[(size_t)application::current_playlist_index]->songs)
         interface::song_menu_entries.push_back(song.title + " ┃ " + song.artist);
+
+      if (application::playlists[(size_t)application::current_playlist_index] == application::current_song_playlist)
+      {
+        application::current_song_playlist->hovered_song = application::current_song_index;
+        interface::hovered_song = application::current_song_index;
+      }
     }
     return true;
   }
@@ -99,7 +106,7 @@ namespace tuim::input
   bool shuffle_current_playlist(bool is_song)
   {
     if (is_song)
-      application::play_random_song_from_playlist(application::playlists[(size_t)application::current_playlist]);
+      application::play_random_song_from_playlist(application::playlists[(size_t)application::current_playlist_index]);
     else
       application::play_random_song_from_playlist(application::playlists[(size_t)interface::hovered_playlist]);
     return true;
@@ -185,6 +192,7 @@ namespace tuim::input
   {
     Mix_FreeMusic(application::current_song);
     application::current_song = nullptr;
+    application::current_song_index = 0;
     application::current_song_display = "None";
     application::paused = false;
     return true;

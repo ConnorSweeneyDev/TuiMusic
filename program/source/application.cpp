@@ -87,34 +87,47 @@ namespace tuim::application
 
   void play_random_song_from_playlist(std::shared_ptr<Playlist> &playlist)
   {
-    Mix_FreeMusic(application::current_song);
-    application::current_song = nullptr;
+    Mix_FreeMusic(current_song);
+    current_song = nullptr;
+    current_song_index = 0;
 
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> dis(0, (int)playlist->songs.size() - 1);
-    int index = dis(gen);
+    current_song_index = dis(gen);
 
-    application::current_song_playlist = playlist;
-    application::Song &new_song = playlist->songs[(size_t)index];
-    application::current_song = Mix_LoadMUS(new_song.path.string().c_str());
-    if (application::current_song == nullptr)
+    int playlist_location = 0;
+    for (auto &existing_playlist : playlists)
+    {
+      if (playlist == existing_playlist) break;
+      playlist_location++;
+    }
+    if (playlist_location == current_playlist_index)
+    {
+      playlist->hovered_song = current_song_index;
+      interface::hovered_song = current_song_index;
+    }
+
+    current_song_playlist = playlist;
+    Song &new_song = playlist->songs[(size_t)current_song_index];
+    current_song = Mix_LoadMUS(new_song.path.string().c_str());
+    if (current_song == nullptr)
     {
       std::cout << "Mix_LoadMUS Error: " << new_song.path << ": " << Mix_GetError() << std::endl;
       exit(EXIT_FAILURE);
     }
 
     float decibels = utility::get_decibels(new_song);
-    application::volume_modifier = decibels / -14.0f;
+    volume_modifier = decibels / -14.0f;
     float real_volume =
-      std::round(((float)application::volume * (MIX_MAX_VOLUME / 100.0f)) * application::volume_modifier);
+      std::round(((float)volume * (MIX_MAX_VOLUME / 100.0f)) * volume_modifier);
     if (real_volume > MIX_MAX_VOLUME) real_volume = MIX_MAX_VOLUME;
     if (real_volume < 0) real_volume = 0;
     Mix_VolumeMusic((int)real_volume);
 
-    Mix_PlayMusic(application::current_song, 0);
-    application::current_song_display = new_song.title + " ┃ " + new_song.artist;
-    application::paused = false;
+    Mix_PlayMusic(current_song, 0);
+    current_song_display = new_song.title + " ┃ " + new_song.artist;
+    paused = false;
   }
 
   std::string get_information_bar()
@@ -158,6 +171,7 @@ namespace tuim::application
         Mix_FreeMusic(current_song);
         current_song = nullptr;
         current_song_display = "None";
+        current_song_index = 0;
         paused = false;
         play_random_song_from_playlist(current_song_playlist);
       }

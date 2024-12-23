@@ -43,7 +43,7 @@ namespace tuim::utility
       }
       application::Playlist new_playlist = {directory, directory.filename().string(), temporary_songs};
       application::playlists.push_back(std::make_shared<application::Playlist>(new_playlist));
-      application::current_song_playlist = application::playlists[(size_t)application::current_playlist];
+      application::current_song_playlist = application::playlists[(size_t)application::current_playlist_index];
     }
   }
 

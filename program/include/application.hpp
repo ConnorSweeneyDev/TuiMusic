@@ -24,7 +24,8 @@ namespace tuim::application
   };
 
   inline std::vector<std::shared_ptr<Playlist>> playlists = {};
-  inline int current_playlist = 0;
+  inline int current_playlist_index = 0;
+  inline int current_song_index = 0;
   inline Mix_Music *current_song = nullptr;
   inline std::shared_ptr<Playlist> current_song_playlist = nullptr;
   inline std::string current_song_display = "None";

@@ -42,7 +42,7 @@ namespace tuim::interface
         return false;
       });
 
-    for (auto &song : application::playlists[(size_t)application::current_playlist]->songs)
+    for (auto &song : application::playlists[(size_t)application::current_playlist_index]->songs)
       song_menu_entries.push_back(song.title + " ┃ " + song.artist);
     ftxui::MenuOption song_menu_option = ftxui::MenuOption::Vertical();
     song_menu_option.focused_entry = ftxui::Ref<int>(&hovered_song);

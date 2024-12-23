@@ -33,6 +33,7 @@ namespace tuim::system
   {
     Mix_FreeMusic(application::current_song);
     application::current_song = nullptr;
+    application::current_song_index = 0;
     Mix_CloseAudio();
     Mix_Quit();
     SDL_Quit();
