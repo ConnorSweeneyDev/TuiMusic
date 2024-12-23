@@ -119,8 +119,7 @@ namespace tuim::application
 
     float decibels = utility::get_decibels(new_song);
     volume_modifier = decibels / -14.0f;
-    float real_volume =
-      std::round(((float)volume * (MIX_MAX_VOLUME / 100.0f)) * volume_modifier);
+    float real_volume = std::round(((float)volume * (MIX_MAX_VOLUME / 100.0f)) * volume_modifier);
     if (real_volume > MIX_MAX_VOLUME) real_volume = MIX_MAX_VOLUME;
     if (real_volume < 0) real_volume = 0;
     Mix_VolumeMusic((int)real_volume);
