@@ -36,6 +36,8 @@ namespace tuim::interface
         if (event == ftxui::Event::k) return input::menu_up(1, false);
         if (event == ftxui::Event::J) return input::menu_down(12, false);
         if (event == ftxui::Event::K) return input::menu_up(12, false);
+        if (event == ftxui::Event::B) return input::menu_down(100000, false);
+        if (event == ftxui::Event::T) return input::menu_up(100000, false);
         if (event == ftxui::Event::l) return input::menu_open_or_close(false);
         if (event == ftxui::Event::s) return input::shuffle_current_playlist(false);
         if (event == ftxui::Event::Return) return input::menu_select(false);
@@ -54,6 +56,8 @@ namespace tuim::interface
         if (event == ftxui::Event::k) return input::menu_up(1, true);
         if (event == ftxui::Event::J) return input::menu_down(12, true);
         if (event == ftxui::Event::K) return input::menu_up(12, true);
+        if (event == ftxui::Event::B) return input::menu_down(100000, true);
+        if (event == ftxui::Event::T) return input::menu_up(100000, true);
         if (event == ftxui::Event::h) return input::menu_open_or_close(true);
         if (event == ftxui::Event::s) return input::shuffle_current_playlist(true);
         if (event == ftxui::Event::Return) return input::menu_select(true);
