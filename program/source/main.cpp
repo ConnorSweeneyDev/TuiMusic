@@ -180,6 +180,12 @@ namespace tuim
           hovered_playlist -= 12;
           return true;
         }
+        if (event == ftxui::Event::AltL)
+        {
+          playlist_menu_width = -1;
+          song_menu->TakeFocus();
+          return true;
+        }
         if (event == ftxui::Event::Return)
         {
           current_playlist = hovered_playlist;
@@ -219,6 +225,12 @@ namespace tuim
           playlists[(size_t)current_playlist]->hovered_song = hovered_song;
           return true;
         }
+        if (event == ftxui::Event::AltH)
+        {
+          playlist_menu_width = playlist_menu_max_width;
+          playlist_menu->TakeFocus();
+          return true;
+        }
         if (event == ftxui::Event::Return)
         {
           Mix_FreeMusic(current_song);
@@ -234,6 +246,7 @@ namespace tuim
           Mix_PlayMusic(current_song, 0);
           current_song_display = song_menu_entries[(size_t)hovered_song];
           paused = false;
+          return true;
         }
         return false;
       });
@@ -266,6 +279,7 @@ namespace tuim
             Mix_SetMusicPosition(Mix_MusicDuration(current_song));
           else
             Mix_SetMusicPosition(new_position);
+          return true;
         }
         if (event == ftxui::Event::H)
         {
@@ -274,6 +288,7 @@ namespace tuim
             Mix_SetMusicPosition(0);
           else
             Mix_SetMusicPosition(new_position);
+          return true;
         }
         if (event == ftxui::Event::U)
         {
@@ -287,27 +302,11 @@ namespace tuim
           Mix_VolumeMusic(volume * (MIX_MAX_VOLUME / 100));
           return true;
         }
-        if (event == ftxui::Event::AltP)
-        {
-          if (playlist_menu_width == -1)
-          {
-            playlist_menu_width = playlist_menu_max_width;
-            playlist_menu->TakeFocus();
-          }
-          else
-          {
-            playlist_menu_width = -1;
-            song_menu->TakeFocus();
-          }
-          return true;
-        }
         if (event == ftxui::Event::Escape)
         {
           screen.ExitLoopClosure()();
           return true;
         }
-        if (event == ftxui::Event::h) return true;
-        if (event == ftxui::Event::l) return true;
         if (event.mouse().motion == ftxui::Mouse::Motion::Moved) return true;
         if (event.mouse().motion == ftxui::Mouse::Motion::Pressed) return true;
         return false;
