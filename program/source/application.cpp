@@ -131,8 +131,8 @@ namespace tuim::application
 
   std::string get_information_bar()
   {
-    if (paused) return current_song_playlist->name + "⏸︎ " + current_song_display;
-    return current_song_playlist->name + "⏵︎ " + current_song_display;
+    if (paused) return "⏸︎ " + current_song_playlist->name + " ┃ " + current_song_display;
+    return "⏵︎ " + current_song_playlist->name + " ┃ " + current_song_display;
   }
 
   std::string get_progress_in_minutes()
@@ -149,8 +149,8 @@ namespace tuim::application
 
   std::string get_duration_in_minutes()
   {
-    if (Mix_PlayingMusic()) return "| " + utility::seconds_to_minutes((int)Mix_MusicDuration(current_song));
-    return "| -:--";
+    if (Mix_PlayingMusic()) return "┃ " + utility::seconds_to_minutes((int)Mix_MusicDuration(current_song));
+    return "┃ -:--";
   }
 
   std::string get_formatted_volume()
