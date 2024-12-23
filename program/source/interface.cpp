@@ -1,11 +1,14 @@
 #include <cstddef>
 #include <cstdlib>
 #include <string>
+#include <vector>
 
 #include "ftxui/component/component.hpp"
+#include "ftxui/component/component_base.hpp"
 #include "ftxui/component/component_options.hpp"
 #include "ftxui/component/mouse.hpp"
 #include "ftxui/dom/elements.hpp"
+#include "ftxui/screen/color.hpp"
 #include "ftxui/screen/screen.hpp"
 #include "ftxui/util/ref.hpp"
 
@@ -15,6 +18,24 @@
 
 namespace tuim::interface
 {
+  ftxui::Component ReactiveMenu(std::vector<std::string> *entries, int *selected)
+  {
+    auto option = ftxui::MenuOption::Vertical();
+    option.focused_entry = ftxui::Ref<int>(selected);
+    option.entries_option.transform = [](ftxui::EntryState state)
+    {
+      std::string icon = application::paused ? "⏸︎ " : "⏵︎ ";
+      state.label = (state.active ? icon : "  ") + state.label;
+      ftxui::Element element = ftxui::text(state.label);
+      if (state.focused) element = element | ftxui::bgcolor(ftxui::Color::RGBA(0, 0, 0, 0));
+      if (state.active)
+        element = element | (application::paused ? ftxui::color(ftxui::Color::Red) : ftxui::color(ftxui::Color::Blue)) |
+                  ftxui::bold;
+      return element;
+    };
+    return Menu(entries, selected, option);
+  }
+
   void initialize_menus()
   {
     ftxui::Screen::Cursor cursor;
@@ -26,9 +47,7 @@ namespace tuim::interface
         playlist_menu_max_width = (int)playlist->name.length();
     playlist_menu_max_width += 3;
     for (auto &playlist : application::playlists) playlist_menu_entries.push_back(playlist->name);
-    ftxui::MenuOption playlist_menu_option = ftxui::MenuOption::Vertical();
-    playlist_menu_option.focused_entry = ftxui::Ref<int>(&hovered_playlist);
-    playlist_menu = ftxui::Menu(&playlist_menu_entries, &hovered_playlist, playlist_menu_option);
+    playlist_menu = ReactiveMenu(&playlist_menu_entries, &hovered_playlist);
     playlist_menu |= ftxui::CatchEvent(
       [&](ftxui::Event event)
       {
@@ -46,9 +65,7 @@ namespace tuim::interface
 
     for (auto &song : application::playlists[(size_t)application::current_playlist_index]->songs)
       song_menu_entries.push_back(song.title + " ┃ " + song.artist);
-    ftxui::MenuOption song_menu_option = ftxui::MenuOption::Vertical();
-    song_menu_option.focused_entry = ftxui::Ref<int>(&hovered_song);
-    song_menu = ftxui::Menu(&song_menu_entries, &hovered_song, song_menu_option);
+    song_menu = ReactiveMenu(&song_menu_entries, &hovered_song);
     song_menu |= ftxui::CatchEvent(
       [&](ftxui::Event event)
       {
@@ -89,21 +106,24 @@ namespace tuim::interface
 
   void initialize_renderer()
   {
-    renderer =
-      ftxui::Renderer(container,
-                      [&]
-                      {
-                        return ftxui::vbox({
-                                 ftxui::hbox({ftxui::text(application::get_information_bar())}) | ftxui::center,
-                                 ftxui::hbox({ftxui::text(application::get_progress_in_minutes()),
-                                              ftxui::gaugeRight(application::get_progress_as_percentage()),
-                                              ftxui::text(application::get_duration_in_minutes()),
-                                              ftxui::text(application::get_formatted_volume())}),
-                                 ftxui::separator(),
-                                 container->Render(),
-                               }) |
-                               ftxui::borderEmpty;
-                      });
+    renderer = ftxui::Renderer(
+      container,
+      [&]
+      {
+        return ftxui::vbox({
+                 ftxui::hbox({ftxui::text(application::get_information_bar())}) | ftxui::center | ftxui::bold |
+                   (application::paused ? ftxui::color(ftxui::Color::Red) : ftxui::color(ftxui::Color::Blue)),
+                 ftxui::hbox({ftxui::text(application::get_progress_in_minutes()),
+                              ftxui::gaugeRight(application::get_progress_as_percentage()),
+                              ftxui::text(application::get_duration_in_minutes()),
+                              ftxui::text(application::get_formatted_volume())}) |
+                   ftxui::bold |
+                   (application::paused ? ftxui::color(ftxui::Color::Red) : ftxui::color(ftxui::Color::Blue)),
+                 ftxui::separator(),
+                 container->Render(),
+               }) |
+               ftxui::borderEmpty;
+      });
     song_menu->TakeFocus();
   }
 }

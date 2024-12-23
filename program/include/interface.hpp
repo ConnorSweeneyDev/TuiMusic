@@ -8,6 +8,7 @@
 
 namespace tuim::interface
 {
+  ftxui::Component ReactiveMenu(std::vector<std::string> *entries, int *selected);
   void initialize_menus();
   void initialize_containers();
   void initialize_renderer();

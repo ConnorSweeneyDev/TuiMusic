@@ -138,7 +138,7 @@ namespace tuim::application
   std::string get_progress_in_minutes()
   {
     if (Mix_PlayingMusic()) return utility::seconds_to_minutes((int)Mix_GetMusicPosition(current_song)) + " ┃";
-    return "0:00 ┃";
+    return "-:-- ┃";
   }
 
   float get_progress_as_percentage()
@@ -150,7 +150,7 @@ namespace tuim::application
   std::string get_duration_in_minutes()
   {
     if (Mix_PlayingMusic()) return "| " + utility::seconds_to_minutes((int)Mix_MusicDuration(current_song));
-    return "| 0:00";
+    return "| -:--";
   }
 
   std::string get_formatted_volume()
