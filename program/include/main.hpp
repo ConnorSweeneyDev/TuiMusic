@@ -39,16 +39,17 @@ namespace tuim
   void cleanup();
 
   inline std::vector<std::shared_ptr<Playlist>> playlists = {};
+  inline int current_playlist = 0;
+  inline Mix_Music *current_song = nullptr;
+  inline std::shared_ptr<Playlist> current_song_playlist = nullptr;
+  inline std::string current_song_display = "None";
+  inline int volume = 10;
+  inline bool paused = false;
+
   inline int hovered_playlist = 0;
   inline int hovered_song = 0;
   inline int playlist_menu_width = -1;
   inline int playlist_menu_max_width = 0;
-
-  inline int current_playlist = 0;
-  inline Mix_Music *current_song = nullptr;
-  inline std::string current_song_display = "None";
-  inline int volume = 10;
-  inline bool paused = false;
 
   inline ftxui::ScreenInteractive screen = ftxui::ScreenInteractive::Fullscreen();
   inline std::vector<std::string> playlist_menu_entries = {};

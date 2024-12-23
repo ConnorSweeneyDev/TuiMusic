@@ -130,6 +130,7 @@ namespace tuim
       }
       Playlist new_playlist = {directory, directory.filename().string(), temporary_songs};
       playlists.push_back(std::make_shared<Playlist>(new_playlist));
+      current_song_playlist = playlists[(size_t)current_playlist];
     }
   }
 
@@ -233,6 +234,7 @@ namespace tuim
         }
         if (event == ftxui::Event::Return)
         {
+          current_song_playlist = playlists[(size_t)current_playlist];
           Mix_FreeMusic(current_song);
           current_song = nullptr;
           Song &new_song = playlists[(size_t)current_playlist]->songs[(size_t)hovered_song];
@@ -320,7 +322,9 @@ namespace tuim
       [&]
       {
         return ftxui::vbox({
-                 ftxui::hbox({ftxui::text((paused ? "⏸︎ " : "⏵︎ ") + current_song_display)}) | ftxui::center,
+                 ftxui::hbox(
+                   {ftxui::text(current_song_playlist->name + (paused ? "⏸︎ " : "⏵︎ ") + current_song_display)}) |
+                   ftxui::center,
                  ftxui::hbox(
                    {ftxui::text(Mix_PlayingMusic() ? seconds_to_minutes((int)Mix_GetMusicPosition(current_song)) + " ┃"
                                                    : "0:00 ┃"),
