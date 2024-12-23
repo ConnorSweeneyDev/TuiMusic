@@ -183,6 +183,7 @@ namespace tuim
         if (event == ftxui::Event::Return)
         {
           current_playlist = hovered_playlist;
+          hovered_song = playlists[(size_t)current_playlist]->hovered_song;
           song_menu_entries.clear();
           for (auto &song : playlists[(size_t)current_playlist]->songs)
             song_menu_entries.push_back(song.title + " ┃ " + song.artist);
@@ -197,21 +198,25 @@ namespace tuim
         if (event == ftxui::Event::j)
         {
           hovered_song++;
+          playlists[(size_t)current_playlist]->hovered_song = hovered_song;
           return true;
         }
         if (event == ftxui::Event::k)
         {
           hovered_song--;
+          playlists[(size_t)current_playlist]->hovered_song = hovered_song;
           return true;
         }
         if (event == ftxui::Event::CtrlD)
         {
           hovered_song += 12;
+          playlists[(size_t)current_playlist]->hovered_song = hovered_song;
           return true;
         }
         if (event == ftxui::Event::CtrlU)
         {
           hovered_song -= 12;
+          playlists[(size_t)current_playlist]->hovered_song = hovered_song;
           return true;
         }
         if (event == ftxui::Event::Return)

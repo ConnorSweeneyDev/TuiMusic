@@ -25,6 +25,7 @@ namespace tuim
     std::filesystem::path path;
     std::string name;
     std::vector<Song> songs;
+    int hovered_song = 0;
   };
 
   void initialize_sdl();
