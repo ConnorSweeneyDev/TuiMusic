@@ -51,8 +51,8 @@ namespace tuim::interface
       {
         if (event == ftxui::Event::j) return input::menu_down(1, true);
         if (event == ftxui::Event::k) return input::menu_up(1, true);
-        if (event == ftxui::Event::CtrlD) return input::menu_down(12, true);
-        if (event == ftxui::Event::CtrlU) return input::menu_up(12, true);
+        if (event == ftxui::Event::J) return input::menu_down(12, true);
+        if (event == ftxui::Event::K) return input::menu_up(12, true);
         if (event == ftxui::Event::h) return input::menu_open_or_close(true);
         if (event == ftxui::Event::Return) return input::menu_select(true);
         return false;
@@ -71,6 +71,8 @@ namespace tuim::interface
         if (event == ftxui::Event::H) return input::seek_backward(5);
         if (event == ftxui::Event::u) return input::volume_up(1);
         if (event == ftxui::Event::d) return input::volume_down(1);
+        if (event == ftxui::Event::U) return input::volume_up(5);
+        if (event == ftxui::Event::D) return input::volume_down(5);
         if (event == ftxui::Event::Escape) return input::escape();
         if (event.mouse().motion == ftxui::Mouse::Motion::Moved) return true;
         if (event.mouse().motion == ftxui::Mouse::Motion::Pressed) return true;
