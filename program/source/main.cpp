@@ -180,6 +180,14 @@ namespace tuim
           hovered_playlist -= 12;
           return true;
         }
+        if (event == ftxui::Event::Return)
+        {
+          current_playlist = hovered_playlist;
+          song_menu_entries.clear();
+          for (auto &song : playlists[(size_t)current_playlist]->songs)
+            song_menu_entries.push_back(song.title + " ┃ " + song.artist);
+          return true;
+        }
         return false;
       });
 
