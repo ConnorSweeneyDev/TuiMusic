@@ -24,6 +24,9 @@ compile_commands.json
 *.mod
 *.smod
 
+# User Specific Files
+user/
+
 # Executables
 TuiMusic.exe
 TuiMusic.out

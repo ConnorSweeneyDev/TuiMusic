@@ -2,10 +2,11 @@
 
 #include <cctype>
 #include <cmath>
-#include <component/event.hpp>
 #include <cstdlib>
 #include <filesystem>
+#include <fstream>
 #include <iostream>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -16,6 +17,7 @@
 #include "ftxui/component/component.hpp"
 #include "ftxui/component/component_base.hpp"
 #include "ftxui/component/component_options.hpp"
+#include "ftxui/component/event.hpp"
 #include "ftxui/component/loop.hpp"
 #include "ftxui/component/mouse.hpp"
 #include "ftxui/component/screen_interactive.hpp"
@@ -29,243 +31,325 @@
 
 int main()
 {
-  if (SDL_Init(SDL_INIT_AUDIO) != 0)
-  {
-    std::cout << "SDL_Init Error: " << SDL_GetError() << std::endl;
-    exit(EXIT_FAILURE);
-  }
-  if (Mix_Init(MIX_INIT_MP3) == 0)
-  {
-    std::cout << "Mix_Init Error: " << Mix_GetError() << std::endl;
-    exit(EXIT_FAILURE);
-  }
-  if (Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 2048) != 0)
-  {
-    std::cout << "Mix_OpenAudio Error: " << Mix_GetError() << std::endl;
-    exit(EXIT_FAILURE);
-  }
+  tuim::initialize_sdl();
+  tuim::initialize_playlists();
+  tuim::initialize_menus();
+  tuim::initialize_menu_keybinds();
+  tuim::initialize_containers();
+  tuim::initialize_container_keybinds();
+  tuim::initialize_renderer();
 
-  std::filesystem::path music_dir = "C:/Users/conno/Music/Songs";
-  std::vector<std::filesystem::path> songs = {};
-  for (const auto &entry : std::filesystem::directory_iterator(music_dir))
-    if (entry.is_regular_file() && entry.path().extension() == ".mp3") songs.push_back(entry.path());
+  tuim::run_loop();
 
-  Mix_Music *music = nullptr;
-  std::vector<std::string> song_list_entries = {};
-  for (std::filesystem::path song : songs)
-  {
-    TagLib::FileRef file(song.string().c_str());
-    if (file.isNull())
-    {
-      std::cout << "FileRef Error: \"" << song << "\" could not be loaded." << std::endl;
-      exit(1);
-    }
-    TagLib::String title_tag = file.tag()->title();
-    std::string title = title_tag.to8Bit(true);
-    TagLib::String artist_tag = file.tag()->artist();
-    std::string artist = artist_tag.to8Bit(true);
-    song_list_entries.push_back(title + " ┃ " + artist);
-  }
-
-  ftxui::ScreenInteractive app_screen = ftxui::ScreenInteractive::Fullscreen();
-  ftxui::Screen::Cursor app_cursor;
-  app_cursor.shape = ftxui::Screen::Cursor::Hidden;
-  app_screen.SetCursor(app_cursor);
-
-  std::vector<std::string> play_list_entries = {};
-  for (int i = 0; i <= 49; i++) play_list_entries.push_back("playlist" + std::to_string(i));
-  play_list_entries.push_back("verylongplaylist50");
-  int max_play_list_width = 0;
-  for (std::string play_list_entry : play_list_entries)
-    if ((int)play_list_entry.length() > max_play_list_width) max_play_list_width = (int)play_list_entry.length();
-  max_play_list_width += 3;
-  int selected_play_list = 0;
-  ftxui::MenuOption play_list_option = ftxui::MenuOption::Vertical();
-  play_list_option.focused_entry = ftxui::Ref<int>(&selected_play_list);
-  ftxui::Component play_list = ftxui::Menu(&play_list_entries, &selected_play_list, play_list_option);
-  int play_list_width = -1;
-
-  int selected_song = 0;
-  ftxui::MenuOption song_list_option = ftxui::MenuOption::Vertical();
-  song_list_option.focused_entry = ftxui::Ref<int>(&selected_song);
-  ftxui::Component song_list = ftxui::Menu(&song_list_entries, &selected_song, song_list_option);
-  std::string playing_song = "None";
-  bool song_paused = false;
-  int volume = 10;
-
-  play_list |= ftxui::CatchEvent(
-    [&](ftxui::Event event)
-    {
-      if (event == ftxui::Event::j)
-      {
-        selected_play_list++;
-        return true;
-      }
-      if (event == ftxui::Event::k)
-      {
-        selected_play_list--;
-        return true;
-      }
-      if (event == ftxui::Event::CtrlD)
-      {
-        selected_play_list += 12;
-        return true;
-      }
-      if (event == ftxui::Event::CtrlU)
-      {
-        selected_play_list -= 12;
-        return true;
-      }
-      return false;
-    });
-  song_list |= ftxui::CatchEvent(
-    [&](ftxui::Event event)
-    {
-      if (event == ftxui::Event::j)
-      {
-        selected_song++;
-        return true;
-      }
-      if (event == ftxui::Event::k)
-      {
-        selected_song--;
-        return true;
-      }
-      if (event == ftxui::Event::CtrlD)
-      {
-        selected_song += 12;
-        return true;
-      }
-      if (event == ftxui::Event::CtrlU)
-      {
-        selected_song -= 12;
-        return true;
-      }
-      if (event == ftxui::Event::Return)
-      {
-        Mix_FreeMusic(music);
-        music = nullptr;
-        music = Mix_LoadMUS(songs[(size_t)selected_song].string().c_str());
-        if (music == nullptr)
-        {
-          std::cout << "Mix_LoadMUS Error: \"" << songs[(size_t)selected_song].string() << "\": " << Mix_GetError()
-                    << std::endl;
-          exit(EXIT_FAILURE);
-        }
-        Mix_VolumeMusic(volume * (MIX_MAX_VOLUME / 100));
-        Mix_PlayMusic(music, 0);
-        playing_song = song_list_entries[(size_t)selected_song];
-        song_paused = false;
-      }
-      return false;
-    });
-
-  ftxui::Component app_container =
-    ftxui::ResizableSplitLeft(play_list | ftxui::yframe, song_list | ftxui::yframe, &play_list_width);
-  app_container |= ftxui::CatchEvent(
-    [&](ftxui::Event event)
-    {
-      if (event == ftxui::Event::P)
-      {
-        if (song_paused)
-          Mix_ResumeMusic();
-        else
-          Mix_PauseMusic();
-        song_paused = !song_paused;
-        return true;
-      }
-      if (event == ftxui::Event::L)
-      {
-        double new_position = Mix_GetMusicPosition(music) + Mix_MusicDuration(music) / 20;
-        if (new_position > Mix_MusicDuration(music))
-          Mix_SetMusicPosition(Mix_MusicDuration(music));
-        else
-          Mix_SetMusicPosition(new_position);
-      }
-      if (event == ftxui::Event::H)
-      {
-        double new_position = Mix_GetMusicPosition(music) - Mix_MusicDuration(music) / 20;
-        if (new_position < 0)
-          Mix_SetMusicPosition(0);
-        else
-          Mix_SetMusicPosition(new_position);
-      }
-      if (event == ftxui::Event::U)
-      {
-        if (volume < 100) volume++;
-        Mix_VolumeMusic(volume * (MIX_MAX_VOLUME / 100));
-        return true;
-      }
-      if (event == ftxui::Event::D)
-      {
-        if (volume > 0) volume--;
-        Mix_VolumeMusic(volume * (MIX_MAX_VOLUME / 100));
-        return true;
-      }
-      if (event == ftxui::Event::AltP)
-      {
-        if (play_list_width == -1)
-        {
-          play_list_width = max_play_list_width;
-          play_list->TakeFocus();
-        }
-        else
-        {
-          play_list_width = -1;
-          song_list->TakeFocus();
-        }
-        return true;
-      }
-      if (event == ftxui::Event::Escape)
-      {
-        app_screen.ExitLoopClosure()();
-        return true;
-      }
-      if (event == ftxui::Event::h) return true;
-      if (event == ftxui::Event::l) return true;
-      if (event.mouse().motion == ftxui::Mouse::Motion::Moved) return true;
-      if (event.mouse().motion == ftxui::Mouse::Motion::Pressed) return true;
-      return false;
-    });
-
-  ftxui::Component app_renderer = ftxui::Renderer(
-    app_container,
-    [&]
-    {
-      return ftxui::vbox({
-               ftxui::hbox({ftxui::text((song_paused ? "⏸︎ " : "⏵︎ ") + playing_song)}) | ftxui::center,
-               ftxui::hbox({ftxui::text("┃"),
-                            ftxui::gaugeRight(playing_song == "None"
-                                                ? 0.0f
-                                                : (float)(Mix_GetMusicPosition(music) / Mix_MusicDuration(music))),
-                            ftxui::text("┃ Vol: " + std::to_string(volume) +
-                                        (volume < 100 ? ((volume < 10) ? "  " : " ") : ""))}),
-               ftxui::separator(),
-               app_container->Render(),
-             }) |
-             ftxui::borderEmpty;
-    });
-
-  song_list->TakeFocus();
-  ftxui::Loop app_loop(&app_screen, app_renderer);
-  while (!app_loop.HasQuitted())
-  {
-    if (!Mix_PlayingMusic())
-    {
-      Mix_FreeMusic(music);
-      music = nullptr;
-      playing_song = "None";
-    }
-    app_loop.RunOnce();
-    app_screen.RequestAnimationFrame();
-    SDL_Delay(10);
-  }
-
-  Mix_FreeMusic(music);
-  music = nullptr;
-  Mix_CloseAudio();
-  Mix_Quit();
-  SDL_Quit();
-
+  tuim::cleanup();
   return EXIT_SUCCESS;
+}
+
+std::string seconds_to_minutes(int seconds)
+{
+  int minutes = seconds / 60;
+  int seconds_remaining = seconds % 60;
+  return std::to_string(minutes) + ":" +
+         ((seconds_remaining < 10) ? "0" + std::to_string(seconds_remaining) : std::to_string(seconds_remaining));
+}
+
+namespace tuim
+{
+  void initialize_sdl()
+  {
+    if (SDL_Init(SDL_INIT_AUDIO) != 0)
+    {
+      std::cout << "SDL_Init Error: " << SDL_GetError() << std::endl;
+      exit(EXIT_FAILURE);
+    }
+    if (Mix_Init(MIX_INIT_MP3) == 0)
+    {
+      std::cout << "Mix_Init Error: " << Mix_GetError() << std::endl;
+      exit(EXIT_FAILURE);
+    }
+    if (Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 2048) != 0)
+    {
+      std::cout << "Mix_OpenAudio Error: " << Mix_GetError() << std::endl;
+      exit(EXIT_FAILURE);
+    }
+  }
+
+  void initialize_playlists()
+  {
+    std::filesystem::path playlists_path = "user/playlists.txt";
+    std::ifstream playlists_file(playlists_path);
+    if (!std::filesystem::exists(playlists_path) || !playlists_file.is_open())
+    {
+      std::cout << "Could not open " << playlists_path << "." << std::endl;
+      exit(EXIT_FAILURE);
+    }
+
+    std::vector<std::filesystem::path> playlist_directories;
+    std::string line;
+    while (std::getline(playlists_file, line))
+    {
+      if (line.length() == 0) continue;
+      std::filesystem::path playlist_path = line;
+      if (!std::filesystem::exists(playlist_path))
+      {
+        std::cout << "Playlist " << playlist_path << " does not exist." << std::endl;
+        exit(EXIT_FAILURE);
+      }
+      playlist_directories.push_back(playlist_path);
+    }
+    playlists_file.close();
+
+    if (playlist_directories.size() == 0)
+    {
+      std::cout << "No playlists found in " << playlists_path << "." << std::endl;
+      exit(EXIT_FAILURE);
+    }
+    for (const auto &directory : playlist_directories)
+    {
+      if (!std::filesystem::is_directory(directory))
+      {
+        std::cout << directory << " is not a directory." << std::endl;
+        exit(EXIT_FAILURE);
+      }
+      std::vector<Song> temporary_songs = {};
+      for (const auto &file : std::filesystem::directory_iterator(directory))
+      {
+        TagLib::FileRef file_reference(file.path().string().c_str());
+        if (file_reference.isNull())
+        {
+          std::cout << "FileRef Error: " << file << " could not be loaded." << std::endl;
+          exit(1);
+        }
+        TagLib::String title_tag = file_reference.tag()->title();
+        std::string title = title_tag.to8Bit(true);
+        TagLib::String artist_tag = file_reference.tag()->artist();
+        std::string artist = artist_tag.to8Bit(true);
+
+        if (file.is_regular_file() && file.path().extension() == ".mp3")
+          temporary_songs.push_back(Song{file.path(), title, artist});
+      }
+      Playlist new_playlist = {directory, directory.filename().string(), temporary_songs};
+      playlists.push_back(std::make_shared<Playlist>(new_playlist));
+    }
+  }
+
+  void initialize_menus()
+  {
+    ftxui::Screen::Cursor cursor;
+    cursor.shape = ftxui::Screen::Cursor::Hidden;
+    screen.SetCursor(cursor);
+
+    for (auto &playlist : playlists)
+      if ((int)playlist->name.length() > playlist_menu_max_width)
+        playlist_menu_max_width = (int)playlist->name.length();
+    playlist_menu_max_width += 3;
+    for (auto &playlist : playlists) playlist_menu_entries.push_back(playlist->name);
+    ftxui::MenuOption playlist_menu_option = ftxui::MenuOption::Vertical();
+    playlist_menu_option.focused_entry = ftxui::Ref<int>(&hovered_playlist);
+    playlist_menu = ftxui::Menu(&playlist_menu_entries, &hovered_playlist, playlist_menu_option);
+
+    for (auto &song : playlists[(size_t)current_playlist]->songs)
+      song_menu_entries.push_back(song.title + " ┃ " + song.artist);
+    ftxui::MenuOption song_menu_option = ftxui::MenuOption::Vertical();
+    song_menu_option.focused_entry = ftxui::Ref<int>(&hovered_song);
+    song_menu = ftxui::Menu(&song_menu_entries, &hovered_song, song_menu_option);
+  }
+
+  void initialize_menu_keybinds()
+  {
+    playlist_menu |= ftxui::CatchEvent(
+      [&](ftxui::Event event)
+      {
+        if (event == ftxui::Event::j)
+        {
+          hovered_playlist++;
+          return true;
+        }
+        if (event == ftxui::Event::k)
+        {
+          hovered_playlist--;
+          return true;
+        }
+        if (event == ftxui::Event::CtrlD)
+        {
+          hovered_playlist += 12;
+          return true;
+        }
+        if (event == ftxui::Event::CtrlU)
+        {
+          hovered_playlist -= 12;
+          return true;
+        }
+        return false;
+      });
+
+    song_menu |= ftxui::CatchEvent(
+      [&](ftxui::Event event)
+      {
+        if (event == ftxui::Event::j)
+        {
+          hovered_song++;
+          return true;
+        }
+        if (event == ftxui::Event::k)
+        {
+          hovered_song--;
+          return true;
+        }
+        if (event == ftxui::Event::CtrlD)
+        {
+          hovered_song += 12;
+          return true;
+        }
+        if (event == ftxui::Event::CtrlU)
+        {
+          hovered_song -= 12;
+          return true;
+        }
+        if (event == ftxui::Event::Return)
+        {
+          Mix_FreeMusic(current_song);
+          current_song = nullptr;
+          Song &new_song = playlists[(size_t)current_playlist]->songs[(size_t)hovered_song];
+          current_song = Mix_LoadMUS(new_song.path.string().c_str());
+          if (current_song == nullptr)
+          {
+            std::cout << "Mix_LoadMUS Error: " << new_song.path << ": " << Mix_GetError() << std::endl;
+            exit(EXIT_FAILURE);
+          }
+          Mix_VolumeMusic(volume * (MIX_MAX_VOLUME / 100));
+          Mix_PlayMusic(current_song, 0);
+          current_song_display = song_menu_entries[(size_t)hovered_song];
+          paused = false;
+        }
+        return false;
+      });
+  }
+
+  void initialize_containers()
+  {
+    container =
+      ftxui::ResizableSplitLeft(playlist_menu | ftxui::yframe, song_menu | ftxui::yframe, &playlist_menu_width);
+  }
+
+  void initialize_container_keybinds()
+  {
+    container |= ftxui::CatchEvent(
+      [&](ftxui::Event event)
+      {
+        if (event == ftxui::Event::P)
+        {
+          if (paused)
+            Mix_ResumeMusic();
+          else
+            Mix_PauseMusic();
+          paused = !paused;
+          return true;
+        }
+        if (event == ftxui::Event::L)
+        {
+          double new_position = Mix_GetMusicPosition(current_song) + Mix_MusicDuration(current_song) / 20;
+          if (new_position > Mix_MusicDuration(current_song))
+            Mix_SetMusicPosition(Mix_MusicDuration(current_song));
+          else
+            Mix_SetMusicPosition(new_position);
+        }
+        if (event == ftxui::Event::H)
+        {
+          double new_position = Mix_GetMusicPosition(current_song) - Mix_MusicDuration(current_song) / 20;
+          if (new_position < 0)
+            Mix_SetMusicPosition(0);
+          else
+            Mix_SetMusicPosition(new_position);
+        }
+        if (event == ftxui::Event::U)
+        {
+          if (volume < 100) volume++;
+          Mix_VolumeMusic(volume * (MIX_MAX_VOLUME / 100));
+          return true;
+        }
+        if (event == ftxui::Event::D)
+        {
+          if (volume > 0) volume--;
+          Mix_VolumeMusic(volume * (MIX_MAX_VOLUME / 100));
+          return true;
+        }
+        if (event == ftxui::Event::AltP)
+        {
+          if (playlist_menu_width == -1)
+          {
+            playlist_menu_width = playlist_menu_max_width;
+            playlist_menu->TakeFocus();
+          }
+          else
+          {
+            playlist_menu_width = -1;
+            song_menu->TakeFocus();
+          }
+          return true;
+        }
+        if (event == ftxui::Event::Escape)
+        {
+          screen.ExitLoopClosure()();
+          return true;
+        }
+        if (event == ftxui::Event::h) return true;
+        if (event == ftxui::Event::l) return true;
+        if (event.mouse().motion == ftxui::Mouse::Motion::Moved) return true;
+        if (event.mouse().motion == ftxui::Mouse::Motion::Pressed) return true;
+        return false;
+      });
+  }
+
+  void initialize_renderer()
+  {
+    renderer = ftxui::Renderer(
+      container,
+      [&]
+      {
+        return ftxui::vbox({
+                 ftxui::hbox({ftxui::text((paused ? "⏸︎ " : "⏵︎ ") + current_song_display)}) | ftxui::center,
+                 ftxui::hbox(
+                   {ftxui::text(Mix_PlayingMusic() ? seconds_to_minutes((int)Mix_GetMusicPosition(current_song)) + " ┃"
+                                                   : "0:00 ┃"),
+                    ftxui::gaugeRight(Mix_PlayingMusic()
+                                        ? (float)(Mix_GetMusicPosition(current_song) / Mix_MusicDuration(current_song))
+                                        : 0.0f),
+                    ftxui::text(
+                      "┃ " + (Mix_PlayingMusic() ? seconds_to_minutes((int)Mix_MusicDuration(current_song)) : "0:00")),
+                    ftxui::text(" Vol: " + std::to_string(volume) +
+                                (volume < 100 ? ((volume < 10) ? "  " : " ") : ""))}),
+                 ftxui::separator(),
+                 container->Render(),
+               }) |
+               ftxui::borderEmpty;
+      });
+    song_menu->TakeFocus();
+  }
+
+  void run_loop()
+  {
+    ftxui::Loop loop(&screen, renderer);
+    while (!loop.HasQuitted())
+    {
+      if (!Mix_PlayingMusic())
+      {
+        Mix_FreeMusic(current_song);
+        current_song = nullptr;
+        current_song_display = "None";
+      }
+      loop.RunOnce();
+      screen.RequestAnimationFrame();
+      SDL_Delay(10);
+    }
+  }
+
+  void cleanup()
+  {
+    Mix_FreeMusic(current_song);
+    current_song = nullptr;
+    Mix_CloseAudio();
+    Mix_Quit();
+    SDL_Quit();
+  }
 }
