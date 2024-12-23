@@ -325,8 +325,7 @@ namespace tuim
                                         : 0.0f),
                     ftxui::text(
                       "┃ " + (Mix_PlayingMusic() ? seconds_to_minutes((int)Mix_MusicDuration(current_song)) : "0:00")),
-                    ftxui::text(" Vol: " + std::to_string(volume) +
-                                (volume < 100 ? ((volume < 10) ? "  " : " ") : ""))}),
+                    ftxui::text(" %" + std::to_string(volume) + (volume < 100 ? ((volume < 10) ? "  " : " ") : ""))}),
                  ftxui::separator(),
                  container->Render(),
                }) |
