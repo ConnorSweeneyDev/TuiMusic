@@ -13,6 +13,7 @@ int main()
 {
   tuim::system::initialize_sdl();
   tuim::application::initialize_playlists();
+  tuim::application::initialize_volume();
   tuim::interface::initialize_menus();
   tuim::interface::initialize_containers();
   tuim::interface::initialize_renderer();

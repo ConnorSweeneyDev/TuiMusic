@@ -37,6 +37,7 @@ namespace tuim::interface
         if (event == ftxui::Event::J) return input::menu_down(12, false);
         if (event == ftxui::Event::K) return input::menu_up(12, false);
         if (event == ftxui::Event::l) return input::menu_open_or_close(false);
+        if (event == ftxui::Event::s) return input::shuffle_current_playlist(false);
         if (event == ftxui::Event::Return) return input::menu_select(false);
         return false;
       });
@@ -54,6 +55,7 @@ namespace tuim::interface
         if (event == ftxui::Event::J) return input::menu_down(12, true);
         if (event == ftxui::Event::K) return input::menu_up(12, true);
         if (event == ftxui::Event::h) return input::menu_open_or_close(true);
+        if (event == ftxui::Event::s) return input::shuffle_current_playlist(true);
         if (event == ftxui::Event::Return) return input::menu_select(true);
         return false;
       });
@@ -73,6 +75,7 @@ namespace tuim::interface
         if (event == ftxui::Event::d) return input::volume_down(1);
         if (event == ftxui::Event::U) return input::volume_up(5);
         if (event == ftxui::Event::D) return input::volume_down(5);
+        if (event == ftxui::Event::n) return input::end_song();
         if (event == ftxui::Event::Escape) return input::escape();
         if (event.mouse().motion == ftxui::Mouse::Motion::Moved) return true;
         if (event.mouse().motion == ftxui::Mouse::Motion::Pressed) return true;

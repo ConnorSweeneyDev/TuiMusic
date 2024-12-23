@@ -33,6 +33,8 @@ namespace tuim::application
   inline bool paused = false;
 
   void initialize_playlists();
+  void initialize_volume();
+  void play_random_song_from_playlist(std::shared_ptr<Playlist> &playlist);
   std::string get_information_bar();
   std::string get_progress_in_minutes();
   float get_progress_as_percentage();

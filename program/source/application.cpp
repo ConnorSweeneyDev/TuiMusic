@@ -1,16 +1,16 @@
+#include <cmath>
 #include <cstdlib>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <memory>
+#include <random>
 #include <string>
 #include <vector>
 
 #include "SDL_mixer.h"
 #include "SDL_timer.h"
 #include "ftxui/component/loop.hpp"
-#include "taglib/fileref.h"
-#include "taglib/tstring.h"
 
 #include "application.hpp"
 #include "interface.hpp"
@@ -48,34 +48,73 @@ namespace tuim::application
       std::cout << "No playlists found in " << playlists_path << "." << std::endl;
       exit(EXIT_FAILURE);
     }
-    for (const auto &directory : playlist_directories)
+    utility::populate_playlists(playlist_directories);
+  }
+
+  void initialize_volume()
+  {
+    std::filesystem::path volume_path = "user/volume.txt";
+    if (!std::filesystem::exists(volume_path))
     {
-      if (!std::filesystem::is_directory(directory))
+      std::ofstream volume_file(volume_path);
+      volume_file << volume;
+      volume_file.close();
+      return;
+    }
+    std::ifstream volume_file(volume_path);
+    if (!volume_file.is_open())
+    {
+      std::cout << "Could not open " << volume_path << "." << std::endl;
+      exit(EXIT_FAILURE);
+    }
+    std::string line;
+    while (std::getline(volume_file, line))
+    {
+      try
       {
-        std::cout << directory << " is not a directory." << std::endl;
+        volume = std::stoi(line);
+      }
+      catch (...)
+      {
+        std::cout << "Could not parse " << volume_path << "." << std::endl;
         exit(EXIT_FAILURE);
       }
-      std::vector<Song> temporary_songs = {};
-      for (const auto &file : std::filesystem::directory_iterator(directory))
-      {
-        TagLib::FileRef file_reference(file.path().string().c_str());
-        if (file_reference.isNull())
-        {
-          std::cout << "FileRef Error: " << file << " could not be loaded." << std::endl;
-          exit(1);
-        }
-        TagLib::String title_tag = file_reference.tag()->title();
-        std::string title = title_tag.to8Bit(true);
-        TagLib::String artist_tag = file_reference.tag()->artist();
-        std::string artist = artist_tag.to8Bit(true);
-
-        if (file.is_regular_file() && file.path().extension() == ".mp3")
-          temporary_songs.push_back(Song{file.path(), title, artist});
-      }
-      Playlist new_playlist = {directory, directory.filename().string(), temporary_songs};
-      playlists.push_back(std::make_shared<Playlist>(new_playlist));
-      current_song_playlist = playlists[(size_t)current_playlist];
+      volume = std::stoi(line);
+      if (volume > 100) volume = 100;
+      if (volume < 0) volume = 0;
     }
+  }
+
+  void play_random_song_from_playlist(std::shared_ptr<Playlist> &playlist)
+  {
+    Mix_FreeMusic(application::current_song);
+    application::current_song = nullptr;
+
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(0, (int)playlist->songs.size() - 1);
+    int index = dis(gen);
+
+    application::current_song_playlist = playlist;
+    application::Song &new_song = playlist->songs[(size_t)index];
+    application::current_song = Mix_LoadMUS(new_song.path.string().c_str());
+    if (application::current_song == nullptr)
+    {
+      std::cout << "Mix_LoadMUS Error: " << new_song.path << ": " << Mix_GetError() << std::endl;
+      exit(EXIT_FAILURE);
+    }
+
+    float decibels = utility::get_decibels(new_song);
+    application::volume_modifier = decibels / -14.0f;
+    float real_volume =
+      std::round(((float)application::volume * (MIX_MAX_VOLUME / 100.0f)) * application::volume_modifier);
+    if (real_volume > MIX_MAX_VOLUME) real_volume = MIX_MAX_VOLUME;
+    if (real_volume < 0) real_volume = 0;
+    Mix_VolumeMusic((int)real_volume);
+
+    Mix_PlayMusic(application::current_song, 0);
+    application::current_song_display = new_song.title + " ┃ " + new_song.artist;
+    application::paused = false;
   }
 
   std::string get_information_bar()
@@ -119,6 +158,8 @@ namespace tuim::application
         Mix_FreeMusic(current_song);
         current_song = nullptr;
         current_song_display = "None";
+        paused = false;
+        play_random_song_from_playlist(current_song_playlist);
       }
       loop.RunOnce();
       interface::screen.RequestAnimationFrame();

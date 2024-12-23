@@ -1,21 +1,50 @@
 #include <cstdlib>
+#include <filesystem>
 #include <iostream>
 #include <memory>
 #include <regex>
 #include <stdio.h>
 #include <string>
+#include <vector>
+
+#include "taglib/fileref.h"
+#include "taglib/tstring.h"
 
 #include "application.hpp"
 #include "utility.hpp"
 
 namespace tuim::utility
 {
-  std::string seconds_to_minutes(int seconds)
+  void populate_playlists(std::vector<std::filesystem::path> &playlist_directories)
   {
-    int minutes = seconds / 60;
-    int seconds_remaining = seconds % 60;
-    return std::to_string(minutes) + ":" +
-           ((seconds_remaining < 10) ? "0" + std::to_string(seconds_remaining) : std::to_string(seconds_remaining));
+    for (const auto &directory : playlist_directories)
+    {
+      if (!std::filesystem::is_directory(directory))
+      {
+        std::cout << directory << " is not a directory." << std::endl;
+        exit(EXIT_FAILURE);
+      }
+      std::vector<application::Song> temporary_songs = {};
+      for (const auto &file : std::filesystem::directory_iterator(directory))
+      {
+        TagLib::FileRef file_reference(file.path().string().c_str());
+        if (file_reference.isNull())
+        {
+          std::cout << "FileRef Error: " << file << " could not be loaded." << std::endl;
+          exit(1);
+        }
+        TagLib::String title_tag = file_reference.tag()->title();
+        std::string title = title_tag.to8Bit(true);
+        TagLib::String artist_tag = file_reference.tag()->artist();
+        std::string artist = artist_tag.to8Bit(true);
+
+        if (file.is_regular_file() && file.path().extension() == ".mp3")
+          temporary_songs.push_back(application::Song{file.path(), title, artist});
+      }
+      application::Playlist new_playlist = {directory, directory.filename().string(), temporary_songs};
+      application::playlists.push_back(std::make_shared<application::Playlist>(new_playlist));
+      application::current_song_playlist = application::playlists[(size_t)application::current_playlist];
+    }
   }
 
   float get_decibels(application::Song &song)
@@ -48,4 +77,13 @@ namespace tuim::utility
       decibels = -14.0f;
     return decibels;
   }
+
+  std::string seconds_to_minutes(int seconds)
+  {
+    int minutes = seconds / 60;
+    int seconds_remaining = seconds % 60;
+    return std::to_string(minutes) + ":" +
+           ((seconds_remaining < 10) ? "0" + std::to_string(seconds_remaining) : std::to_string(seconds_remaining));
+  }
+
 }

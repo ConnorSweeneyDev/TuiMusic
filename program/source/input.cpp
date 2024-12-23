@@ -2,6 +2,8 @@
 #include <cstddef>
 #include <cstdio>
 #include <cstdlib>
+#include <filesystem>
+#include <fstream>
 #include <iostream>
 #include <memory>
 #include <stdio.h>
@@ -94,6 +96,15 @@ namespace tuim::input
     return true;
   }
 
+  bool shuffle_current_playlist(bool is_song)
+  {
+    if (is_song)
+      application::play_random_song_from_playlist(application::playlists[(size_t)application::current_playlist]);
+    else
+      application::play_random_song_from_playlist(application::playlists[(size_t)interface::hovered_playlist]);
+    return true;
+  }
+
   bool pause_or_play()
   {
     if (application::paused)
@@ -135,6 +146,16 @@ namespace tuim::input
     if (real_volume > MIX_MAX_VOLUME) real_volume = MIX_MAX_VOLUME;
     if (real_volume < 0) real_volume = 0;
     Mix_VolumeMusic((int)real_volume);
+
+    std::filesystem::path volume_path = "user/volume.txt";
+    std::ofstream volume_file(volume_path);
+    if (!volume_file.is_open())
+    {
+      std::cout << "Could not open " << volume_path << "." << std::endl;
+      exit(EXIT_FAILURE);
+    }
+    volume_file << application::volume;
+    volume_file.close();
     return true;
   }
 
@@ -147,6 +168,25 @@ namespace tuim::input
     if (real_volume > MIX_MAX_VOLUME) real_volume = MIX_MAX_VOLUME;
     if (real_volume < 0) real_volume = 0;
     Mix_VolumeMusic((int)real_volume);
+
+    std::filesystem::path volume_path = "user/volume.txt";
+    std::ofstream volume_file(volume_path);
+    if (!volume_file.is_open())
+    {
+      std::cout << "Could not open " << volume_path << "." << std::endl;
+      exit(EXIT_FAILURE);
+    }
+    volume_file << application::volume;
+    volume_file.close();
+    return true;
+  }
+
+  bool end_song()
+  {
+    Mix_FreeMusic(application::current_song);
+    application::current_song = nullptr;
+    application::current_song_display = "None";
+    application::paused = false;
     return true;
   }
 
