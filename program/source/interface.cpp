@@ -15,6 +15,7 @@
 #include "application.hpp"
 #include "input.hpp"
 #include "interface.hpp"
+#include "utility.hpp"
 
 namespace tuim::interface
 {
@@ -92,6 +93,7 @@ namespace tuim::interface
         if (event == ftxui::Event::p) return input::pause_or_play();
         if (event == ftxui::Event::L) return input::seek_forward(5);
         if (event == ftxui::Event::H) return input::seek_backward(5);
+        if (utility::is_number(event.character())) return input::seek_to(std::stoi(event.character()) * 10);
         if (event == ftxui::Event::u) return input::volume_up(1);
         if (event == ftxui::Event::d) return input::volume_down(1);
         if (event == ftxui::Event::U) return input::volume_up(5);

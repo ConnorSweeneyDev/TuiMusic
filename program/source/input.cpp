@@ -144,6 +144,18 @@ namespace tuim::input
     return true;
   }
 
+  bool seek_to(int percentage)
+  {
+    double new_position = Mix_MusicDuration(application::current_song) * (double)((float)percentage / 100.0f);
+    if (new_position > Mix_MusicDuration(application::current_song))
+      Mix_SetMusicPosition(Mix_MusicDuration(application::current_song));
+    else if (new_position < 0)
+      Mix_SetMusicPosition(0);
+    else
+      Mix_SetMusicPosition(new_position);
+    return true;
+  }
+
   bool volume_up(int amount)
   {
     application::volume += amount;
@@ -174,8 +186,9 @@ namespace tuim::input
   {
     Mix_FreeMusic(application::current_song);
     application::current_song = nullptr;
-    application::current_song_index = 0;
     application::current_song_display = "None";
+    application::current_song_index = 0;
+    application::current_song_percentage = 0;
     application::paused = false;
     return true;
   }
@@ -183,6 +196,7 @@ namespace tuim::input
   bool escape()
   {
     interface::screen.ExitLoopClosure()();
+    utility::write_state_file();
     return true;
   }
 }

@@ -11,6 +11,7 @@ namespace tuim::input
   bool pause_or_play();
   bool seek_forward(int percentage);
   bool seek_backward(int percentage);
+  bool seek_to(int percentage);
   bool volume_up(int amount);
   bool volume_down(int amount);
   bool end_song();

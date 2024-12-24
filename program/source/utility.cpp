@@ -47,6 +47,25 @@ namespace tuim::utility
     }
   }
 
+  void write_state_file()
+  {
+    std::filesystem::path state_path = "user/state.txt";
+    std::ofstream state_file(state_path);
+
+    state_file << application::volume << std::endl;
+    int target_playlist_index = 0;
+    for (auto &playlist : application::playlists)
+    {
+      if (playlist == application::current_song_playlist) break;
+      target_playlist_index++;
+    }
+    state_file << target_playlist_index << std::endl;
+    state_file << application::current_song_index << std::endl;
+    state_file << application::current_song_percentage << std::endl;
+
+    state_file.close();
+  }
+
   float get_decibels(application::Song &song)
   {
     std::string command = "ffmpeg -i \"" + song.path.string() + "\" -filter:a volumedetect -f null /dev/null 2>&1";
@@ -86,20 +105,10 @@ namespace tuim::utility
            ((seconds_remaining < 10) ? "0" + std::to_string(seconds_remaining) : std::to_string(seconds_remaining));
   }
 
-  void write_state_file()
+  bool is_number(std::string string)
   {
-    std::filesystem::path state_path = "user/state.txt";
-    std::ofstream state_file(state_path);
-
-    state_file << application::volume << std::endl;
-    int target_playlist_index = 0;
-    for (auto &playlist : application::playlists)
-    {
-      if (playlist == application::current_song_playlist) break;
-      target_playlist_index++;
-    }
-    state_file << target_playlist_index << std::endl;
-
-    state_file.close();
+    for (auto &character : string)
+      if (character < '0' || character > '9') return false;
+    return true;
   }
 }
