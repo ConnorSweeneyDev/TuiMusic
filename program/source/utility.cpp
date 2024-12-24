@@ -1,5 +1,6 @@
 #include <cstdlib>
 #include <filesystem>
+#include <fstream>
 #include <iostream>
 #include <memory>
 #include <regex>
@@ -43,7 +44,6 @@ namespace tuim::utility
       }
       application::Playlist new_playlist = {directory, directory.filename().string(), temporary_songs};
       application::playlists.push_back(std::make_shared<application::Playlist>(new_playlist));
-      application::current_song_playlist = application::playlists[(size_t)application::current_playlist_index];
     }
   }
 
@@ -86,4 +86,20 @@ namespace tuim::utility
            ((seconds_remaining < 10) ? "0" + std::to_string(seconds_remaining) : std::to_string(seconds_remaining));
   }
 
+  void write_state_file()
+  {
+    std::filesystem::path state_path = "user/state.txt";
+    std::ofstream state_file(state_path);
+
+    state_file << application::volume << std::endl;
+    int target_playlist_index = 0;
+    for (auto &playlist : application::playlists)
+    {
+      if (playlist == application::current_song_playlist) break;
+      target_playlist_index++;
+    }
+    state_file << target_playlist_index << std::endl;
+
+    state_file.close();
+  }
 }

@@ -51,38 +51,33 @@ namespace tuim::application
     utility::populate_playlists(playlist_directories);
   }
 
-  void initialize_volume()
+  void initialize_state()
   {
-    std::filesystem::path volume_path = "user/volume.txt";
-    if (!std::filesystem::exists(volume_path))
+    std::filesystem::path state_path = "user/state.txt";
+    if (!std::filesystem::exists(state_path))
     {
-      std::ofstream volume_file(volume_path);
-      volume_file << volume;
-      volume_file.close();
+      application::current_song_playlist = application::playlists[(size_t)application::current_playlist_index];
+      interface::hovered_song = application::current_playlist_index;
+      utility::write_state_file();
       return;
     }
-    std::ifstream volume_file(volume_path);
-    if (!volume_file.is_open())
+    std::ifstream state_file(state_path);
+    if (!state_file.is_open())
     {
-      std::cout << "Could not open " << volume_path << "." << std::endl;
+      std::cout << "Could not open " << state_path << "." << std::endl;
       exit(EXIT_FAILURE);
     }
     std::string line;
-    while (std::getline(volume_file, line))
-    {
-      try
-      {
-        volume = std::stoi(line);
-      }
-      catch (...)
-      {
-        std::cout << "Could not parse " << volume_path << "." << std::endl;
-        exit(EXIT_FAILURE);
-      }
-      volume = std::stoi(line);
-      if (volume > 100) volume = 100;
-      if (volume < 0) volume = 0;
-    }
+    std::getline(state_file, line);
+    application::volume = std::stoi(line);
+    if (application::volume < 0 || application::volume > 100) application::volume = 10;
+    std::getline(state_file, line);
+    application::current_playlist_index = std::stoi(line);
+    if ((size_t)application::current_playlist_index >= application::playlists.size())
+      application::current_playlist_index = 0;
+    application::current_song_playlist = application::playlists[(size_t)application::current_playlist_index];
+    interface::hovered_playlist = application::current_playlist_index;
+    utility::write_state_file();
   }
 
   void play_random_song_from_playlist(std::shared_ptr<Playlist> &playlist)
@@ -127,6 +122,7 @@ namespace tuim::application
     Mix_PlayMusic(current_song, 0);
     current_song_display = new_song.title + " ┃ " + new_song.artist;
     paused = false;
+    utility::write_state_file();
   }
 
   std::string get_information_bar()
