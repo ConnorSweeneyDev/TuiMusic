@@ -58,7 +58,7 @@ namespace tuim::application
     if (!std::filesystem::exists(state_path))
     {
       current_song_playlist = playlists[(size_t)current_playlist_index];
-      interface::hovered_song = current_playlist_index;
+      interface::hovered_playlist = current_playlist_index;
       utility::write_state_file();
       return;
     }
@@ -75,7 +75,10 @@ namespace tuim::application
     bool different_song = false;
     std::getline(state_file, line);
     current_playlist_index = std::stoi(line);
-    if ((size_t)current_playlist_index >= playlists.size())
+    std::getline(state_file, line);
+    std::string previous_playlist_name = line;
+    if ((size_t)current_playlist_index >= playlists.size() ||
+        previous_playlist_name != application::playlists[(size_t)current_playlist_index]->name)
     {
       different_song = true;
       current_playlist_index = 0;

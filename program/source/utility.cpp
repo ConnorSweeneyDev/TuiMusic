@@ -60,6 +60,7 @@ namespace tuim::utility
       target_playlist_index++;
     }
     state_file << target_playlist_index << std::endl;
+    state_file << application::current_song_playlist->name << std::endl;
     state_file << application::current_song_index << std::endl;
     state_file << application::current_song_percentage << std::endl;
 
