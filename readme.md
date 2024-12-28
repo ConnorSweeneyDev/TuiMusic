@@ -1,10 +1,10 @@
 # TuiMusic
 A terminal-based music player written using SDL, FTXUI and TagLib that has playlists and normalizes volume around -14dB.
+
 Playlists are in the form of folders on your filesystem - place absolute paths to folders in the `user/playlists.txt`
 directory and the player will load them on startup. The player will start playing a random song from the first playlist
 and will continue to pick random songs from that playlist after it finishes playing the current one. If you manually
-change the playlist the player will start playing a random song from the new playlist instead. State is tracked in the
-`user/state.txt` file.
+change the playlist the player will start playing a random song from the new playlist instead.
 
 https://github.com/user-attachments/assets/87bf883f-6ad6-49fc-ba6c-ccc36f908da1
 
