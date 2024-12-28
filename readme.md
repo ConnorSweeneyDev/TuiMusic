@@ -7,20 +7,23 @@ Playlists are in the form of folders on your filesystem - place absolute paths t
 directory and the player will load them on startup. The player will start playing a random song from the first playlist
 and will continue to pick random songs from that playlist after it finishes playing the current one. If you manually
 change the playlist the player will start playing a random song from the new playlist instead. State is tracked in the
-`user/state.txt` file. Controls are as follows:
-- <kbd>j</kbd> or <kbd>k</kbd> to navigate the focused menu by 1 item.
-- <kbd>J</kbd> or <kbd>K</kbd> to navigate the focused menu by 12 items.
-- <kbd>B</kbd> or <kbd>T</kbd> to navigate to the top/bottom of the focused menu.
-- <kbd>return</kbd> to select the focused menu item.
-- <kbd>s</kbd> to shuffle the current/focused playlist.
-- <kbd>p</kbd> to pause/unpause.
-- <kbd>h</kbd> or <kbd>l</kbd> to open/close the playlists tab.
-- <kbd>H</kbd> or <kbd>L</kbd> to seek forward/backward by 5%.
-- <kbd>0</kbd>, <kbd>1</kbd>... <kbd>9</kbd> to seek to 0%, 10%... 90% of the song.
-- <kbd>n</kbd> to end the current song.
-- <kbd>u</kbd> or <kbd>d</kbd> to increase/decrease the volume by 1%.
-- <kbd>U</kbd> or <kbd>D</kbd> to increase/decrease the volume by 5%.
-- <kbd>escape</kbd> to close the player.
+`user/state.txt` file.
+
+> [!NOTE]
+> Controls are as follows:
+> - <kbd>j</kbd> or <kbd>k</kbd> to navigate the focused menu by 1 item.
+> - <kbd>J</kbd> or <kbd>K</kbd> to navigate the focused menu by 12 items.
+> - <kbd>B</kbd> or <kbd>T</kbd> to navigate to the top/bottom of the focused menu.
+> - <kbd>return</kbd> to select the focused menu item.
+> - <kbd>s</kbd> to shuffle the current/focused playlist.
+> - <kbd>p</kbd> to pause/unpause.
+> - <kbd>h</kbd> or <kbd>l</kbd> to open/close the playlists tab.
+> - <kbd>H</kbd> or <kbd>L</kbd> to seek forward/backward by 5%.
+> - <kbd>0</kbd>, <kbd>1</kbd>... <kbd>9</kbd> to seek to 0%, 10%... 90% of the song.
+> - <kbd>n</kbd> to end the current song.
+> - <kbd>u</kbd> or <kbd>d</kbd> to increase/decrease the volume by 1%.
+> - <kbd>U</kbd> or <kbd>D</kbd> to increase/decrease the volume by 5%.
+> - <kbd>escape</kbd> to close the player.
 
 # Building and Executing
 This project is optimized to be built with the following targets in mind:
