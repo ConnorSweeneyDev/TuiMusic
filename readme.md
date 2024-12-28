@@ -12,11 +12,11 @@ https://github.com/user-attachments/assets/87bf883f-6ad6-49fc-ba6c-ccc36f908da1
 > Controls are as follows:
 > - <kbd>j</kbd> or <kbd>k</kbd> to navigate the focused menu by 1 item.
 > - <kbd>J</kbd> or <kbd>K</kbd> to navigate the focused menu by 12 items.
-> - <kbd>B</kbd> or <kbd>T</kbd> to navigate to the top/bottom of the focused menu.
+> - <kbd>T</kbd> or <kbd>B</kbd> to navigate to the top/bottom of the focused menu.
+> - <kbd>h</kbd> or <kbd>l</kbd> to open/close the playlists tab.
 > - <kbd>return</kbd> to select the focused menu item.
 > - <kbd>s</kbd> to shuffle the current/focused playlist.
 > - <kbd>p</kbd> to pause/unpause.
-> - <kbd>h</kbd> or <kbd>l</kbd> to open/close the playlists tab.
 > - <kbd>H</kbd> or <kbd>L</kbd> to seek forward/backward by 5%.
 > - <kbd>0</kbd>, <kbd>1</kbd>... <kbd>9</kbd> to seek to 0%, 10%... 90% of the song.
 > - <kbd>n</kbd> to end the current song.
