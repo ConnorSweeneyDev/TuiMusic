@@ -1,3 +1,4 @@
+#include <component/event.hpp>
 #include <cstddef>
 #include <cstdlib>
 #include <string>
@@ -60,13 +61,13 @@ namespace tuim::interface
     playlist_menu |= ftxui::CatchEvent(
       [&](ftxui::Event event)
       {
-        if (event == ftxui::Event::j) return input::menu_down(1, false);
-        if (event == ftxui::Event::k) return input::menu_up(1, false);
+        if (event == ftxui::Event::j || event == ftxui::Event::ArrowDown) return input::menu_down(1, false);
+        if (event == ftxui::Event::k || event == ftxui::Event::ArrowUp) return input::menu_up(1, false);
         if (event == ftxui::Event::J) return input::menu_down(12, false);
         if (event == ftxui::Event::K) return input::menu_up(12, false);
         if (event == ftxui::Event::B) return input::menu_down(100000, false);
         if (event == ftxui::Event::T) return input::menu_up(100000, false);
-        if (event == ftxui::Event::l) return input::menu_open_or_close(false);
+        if (event == ftxui::Event::l || event == ftxui::Event::ArrowRight) return input::menu_open_or_close(false);
         if (event == ftxui::Event::s) return input::shuffle_current_playlist(false);
         if (event == ftxui::Event::Return) return input::menu_select(false);
         return false;
@@ -85,19 +86,19 @@ namespace tuim::interface
           if (event == ftxui::Event::Return)
           {
             input::menu_select(true);
-            input::toggle_search();
-            return true;
+            return input::toggle_search();
           }
+          if (event == ftxui::Event::ArrowLeft || event == ftxui::Event::ArrowRight) return true;
         }
         else
         {
-          if (event == ftxui::Event::j) return input::menu_down(1, true);
-          if (event == ftxui::Event::k) return input::menu_up(1, true);
+          if (event == ftxui::Event::j || event == ftxui::Event::ArrowDown) return input::menu_down(1, true);
+          if (event == ftxui::Event::k || event == ftxui::Event::ArrowUp) return input::menu_up(1, true);
           if (event == ftxui::Event::J) return input::menu_down(12, true);
           if (event == ftxui::Event::K) return input::menu_up(12, true);
           if (event == ftxui::Event::B) return input::menu_down(100000, true);
           if (event == ftxui::Event::T) return input::menu_up(100000, true);
-          if (event == ftxui::Event::h) return input::menu_open_or_close(true);
+          if (event == ftxui::Event::h || event == ftxui::Event::ArrowLeft) return input::menu_open_or_close(true);
           if (event == ftxui::Event::s) return input::shuffle_current_playlist(true);
           if (event == ftxui::Event::Return) return input::menu_select(true);
 

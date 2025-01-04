@@ -10,10 +10,10 @@ https://github.com/user-attachments/assets/87bf883f-6ad6-49fc-ba6c-ccc36f908da1
 
 > [!NOTE]
 > Controls are as follows:
-> - <kbd>j</kbd> or <kbd>k</kbd> to navigate the focused menu by 1 item.
+> - <kbd>j</kbd>, <kbd>k</kbd>, <kbd>down</kbd> or <kbd>up</kbd> to navigate the focused menu by 1 item.
 > - <kbd>J</kbd> or <kbd>K</kbd> to navigate the focused menu by 12 items.
 > - <kbd>T</kbd> or <kbd>B</kbd> to navigate to the top/bottom of the focused menu.
-> - <kbd>h</kbd> or <kbd>l</kbd> to open/close the playlists tab.
+> - <kbd>h</kbd>, <kbd>l</kbd>, <kbd>left</kbd> or <kbd>right</kbd> to open/close the playlists tab.
 > - <kbd>ctrl</kbd> + <kbd>f</kbd> to toggle search mode, type in the form `artist`, `title`, `artist|title` or
 >   `title|artist`.
 > - <kbd>return</kbd> to select the focused menu item.
