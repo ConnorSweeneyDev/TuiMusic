@@ -6,7 +6,7 @@ directory and the player will load them on startup. The player will start playin
 and will continue to pick random songs from that playlist after it finishes playing the current one. If you manually
 change the playlist the player will start playing a random song from the new playlist instead.
 
-https://github.com/user-attachments/assets/87bf883f-6ad6-49fc-ba6c-ccc36f908da1
+https://github.com/user-attachments/assets/3fbff835-79ea-43ff-94e3-9e1b7c17d316
 
 > [!NOTE]
 > Controls are as follows:
