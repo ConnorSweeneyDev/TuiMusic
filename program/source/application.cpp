@@ -206,7 +206,13 @@ namespace tuim::application
 
   int get_closest_match_index()
   {
-    if (search_query.empty()) return current_song_index;
+    if (search_query.empty())
+    {
+      if (current_song_playlist == playlists[(size_t)current_playlist_index])
+        return current_song_index;
+      else
+        return interface::hovered_song;
+    }
     std::string lowercase_search_query = search_query;
     std::transform(lowercase_search_query.begin(), lowercase_search_query.end(), lowercase_search_query.begin(),
                    tolower);
@@ -221,7 +227,7 @@ namespace tuim::application
     if (first.empty())
     {
       int count = 0;
-      for (auto &song : current_song_playlist->songs)
+      for (auto &song : playlists[(size_t)interface::hovered_playlist]->songs)
       {
         std::string lowercase_artist = song.artist;
         std::transform(lowercase_artist.begin(), lowercase_artist.end(), lowercase_artist.begin(), tolower);
@@ -230,7 +236,7 @@ namespace tuim::application
         count++;
       }
       count = 0;
-      for (auto &song : current_song_playlist->songs)
+      for (auto &song : playlists[(size_t)interface::hovered_playlist]->songs)
       {
         std::string lowercase_title = song.title;
         std::transform(lowercase_title.begin(), lowercase_title.end(), lowercase_title.begin(), tolower);
@@ -242,7 +248,7 @@ namespace tuim::application
     else
     {
       int count = 0;
-      for (auto &song : current_song_playlist->songs)
+      for (auto &song : playlists[(size_t)interface::hovered_playlist]->songs)
       {
         std::string lowercase_artist = song.artist;
         std::string lowercase_title = song.title;
@@ -256,7 +262,7 @@ namespace tuim::application
         count++;
       }
       count = 0;
-      for (auto &song : current_song_playlist->songs)
+      for (auto &song : playlists[(size_t)interface::hovered_playlist]->songs)
       {
         std::string lowercase_title = song.title;
         std::string lowercase_artist = song.artist;
