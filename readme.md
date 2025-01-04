@@ -1,6 +1,16 @@
 # TuiMusic
-A terminal-based music player written using SDL, FTXUI and TagLib that has playlists and normalizes volume around -14dB.
+A terminal-based music player written using SDL, FTXUI and TagLib. It features:
+- Pause/Unpause
+- Seek
+- Skip
+- Volume Up/Down
+- Search
+- Playlists
+- Shuffle
+- Per-Song Volume Normalization Around -14dB
+- Persistent State
 
+## Usage
 Playlists are in the form of folders on your filesystem - place absolute paths to folders in the `user/playlists.txt`
 directory and the player will load them on startup. The player will start playing a random song from the first playlist
 and will continue to pick random songs from that playlist after it finishes playing the current one. If you manually
