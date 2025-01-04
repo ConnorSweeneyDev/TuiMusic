@@ -244,14 +244,28 @@ namespace tuim::application
       int count = 0;
       for (auto &song : current_song_playlist->songs)
       {
-        std::string lowercase_title = song.title;
         std::string lowercase_artist = song.artist;
-        std::transform(lowercase_title.begin(), lowercase_title.end(), lowercase_title.begin(), tolower);
+        std::string lowercase_title = song.title;
         std::transform(lowercase_artist.begin(), lowercase_artist.end(), lowercase_artist.begin(), tolower);
+        std::transform(lowercase_title.begin(), lowercase_title.end(), lowercase_title.begin(), tolower);
         if (lowercase_artist.length() >= first.length())
           if (lowercase_title.length() >= second.length())
             if (lowercase_artist.substr(0, first.length()) == first &&
                 lowercase_title.substr(0, second.length()) == second)
+              return count;
+        count++;
+      }
+      count = 0;
+      for (auto &song : current_song_playlist->songs)
+      {
+        std::string lowercase_title = song.title;
+        std::string lowercase_artist = song.artist;
+        std::transform(lowercase_title.begin(), lowercase_title.end(), lowercase_title.begin(), tolower);
+        std::transform(lowercase_artist.begin(), lowercase_artist.end(), lowercase_artist.begin(), tolower);
+        if (lowercase_title.length() >= first.length())
+          if (lowercase_artist.length() >= second.length())
+            if (lowercase_title.substr(0, first.length()) == first &&
+                lowercase_artist.substr(0, second.length()) == second)
               return count;
         count++;
       }
