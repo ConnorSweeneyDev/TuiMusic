@@ -112,6 +112,25 @@ namespace tuim::input
     return true;
   }
 
+  bool toggle_search()
+  {
+    if (application::searching) application::search_query = "";
+    application::searching = !application::searching;
+    return true;
+  }
+
+  bool append_to_search_query(std::string character)
+  {
+    application::search_query += character;
+    return true;
+  }
+
+  bool pop_from_search_query()
+  {
+    if (!application::search_query.empty()) application::search_query.pop_back();
+    return true;
+  }
+
   bool pause_or_play()
   {
     if (application::paused)

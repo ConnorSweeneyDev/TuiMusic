@@ -33,6 +33,8 @@ namespace tuim::application
   inline int volume = 10;
   inline float volume_modifier = 1.0f;
   inline bool paused = false;
+  inline bool searching = false;
+  inline std::string search_query = "";
 
   void initialize_playlists();
   void initialize_state();
@@ -41,6 +43,7 @@ namespace tuim::application
   std::string get_progress_in_minutes();
   float get_progress_as_percentage();
   std::string get_duration_in_minutes();
+  std::string get_search_text();
   std::string get_formatted_volume();
   void run_loop();
 }

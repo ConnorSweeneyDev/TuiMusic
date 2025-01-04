@@ -5,9 +5,11 @@
 
 #include "ftxui/component/component_base.hpp"
 #include "ftxui/component/screen_interactive.hpp"
+#include "ftxui/dom/elements.hpp"
 
 namespace tuim::interface
 {
+  ftxui::Decorator ReactiveColor();
   ftxui::Component ReactiveMenu(std::vector<std::string> *entries, int *selected);
   void initialize_menus();
   void initialize_containers();

@@ -19,19 +19,27 @@
 
 namespace tuim::interface
 {
+  ftxui::Decorator ReactiveColor()
+  {
+    return [&](ftxui::Element element)
+    {
+      return element | (application::searching ? ftxui::color(ftxui::Color::Yellow)
+                        : application::paused  ? ftxui::color(ftxui::Color::Red)
+                                               : ftxui::color(ftxui::Color::Blue));
+    };
+  }
+
   ftxui::Component ReactiveMenu(std::vector<std::string> *entries, int *selected)
   {
     auto option = ftxui::MenuOption::Vertical();
     option.focused_entry = ftxui::Ref<int>(selected);
     option.entries_option.transform = [](ftxui::EntryState state)
     {
-      std::string icon = application::paused ? "⏸︎ " : "⏵︎ ";
+      std::string icon = application::searching ? "? " : application::paused ? "⏸︎ " : "⏵︎ ";
       state.label = (state.active ? icon : "  ") + state.label;
       ftxui::Element element = ftxui::text(state.label);
       if (state.focused) element = element | ftxui::bgcolor(ftxui::Color::RGBA(0, 0, 0, 0));
-      if (state.active)
-        element = element | (application::paused ? ftxui::color(ftxui::Color::Red) : ftxui::color(ftxui::Color::Blue)) |
-                  ftxui::bold;
+      if (state.active) element = element | ftxui::bold | ReactiveColor();
       return element;
     };
     return Menu(entries, selected, option);
@@ -70,15 +78,34 @@ namespace tuim::interface
     song_menu |= ftxui::CatchEvent(
       [&](ftxui::Event event)
       {
-        if (event == ftxui::Event::j) return input::menu_down(1, true);
-        if (event == ftxui::Event::k) return input::menu_up(1, true);
-        if (event == ftxui::Event::J) return input::menu_down(12, true);
-        if (event == ftxui::Event::K) return input::menu_up(12, true);
-        if (event == ftxui::Event::B) return input::menu_down(100000, true);
-        if (event == ftxui::Event::T) return input::menu_up(100000, true);
-        if (event == ftxui::Event::h) return input::menu_open_or_close(true);
-        if (event == ftxui::Event::s) return input::shuffle_current_playlist(true);
-        if (event == ftxui::Event::Return) return input::menu_select(true);
+        if (application::searching)
+        {
+          if (event.is_character()) return input::append_to_search_query(event.character());
+          if (event == ftxui::Event::Backspace) return input::pop_from_search_query();
+        }
+        else
+        {
+          if (event == ftxui::Event::j) return input::menu_down(1, true);
+          if (event == ftxui::Event::k) return input::menu_up(1, true);
+          if (event == ftxui::Event::J) return input::menu_down(12, true);
+          if (event == ftxui::Event::K) return input::menu_up(12, true);
+          if (event == ftxui::Event::B) return input::menu_down(100000, true);
+          if (event == ftxui::Event::T) return input::menu_up(100000, true);
+          if (event == ftxui::Event::h) return input::menu_open_or_close(true);
+          if (event == ftxui::Event::s) return input::shuffle_current_playlist(true);
+          if (event == ftxui::Event::Return) return input::menu_select(true);
+
+          if (event == ftxui::Event::p) return input::pause_or_play();
+          if (event == ftxui::Event::L) return input::seek_forward(5);
+          if (event == ftxui::Event::H) return input::seek_backward(5);
+          if (utility::is_number(event.character())) return input::seek_to(std::stoi(event.character()) * 10);
+          if (event == ftxui::Event::u) return input::volume_up(1);
+          if (event == ftxui::Event::d) return input::volume_down(1);
+          if (event == ftxui::Event::U) return input::volume_up(5);
+          if (event == ftxui::Event::D) return input::volume_down(5);
+          if (event == ftxui::Event::n) return input::end_song();
+        }
+        if (event == ftxui::Event::CtrlF) return input::toggle_search();
         return false;
       });
   }
@@ -90,15 +117,6 @@ namespace tuim::interface
     container |= ftxui::CatchEvent(
       [&](ftxui::Event event)
       {
-        if (event == ftxui::Event::p) return input::pause_or_play();
-        if (event == ftxui::Event::L) return input::seek_forward(5);
-        if (event == ftxui::Event::H) return input::seek_backward(5);
-        if (utility::is_number(event.character())) return input::seek_to(std::stoi(event.character()) * 10);
-        if (event == ftxui::Event::u) return input::volume_up(1);
-        if (event == ftxui::Event::d) return input::volume_down(1);
-        if (event == ftxui::Event::U) return input::volume_up(5);
-        if (event == ftxui::Event::D) return input::volume_down(5);
-        if (event == ftxui::Event::n) return input::end_song();
         if (event == ftxui::Event::Escape) return input::escape();
         if (event.mouse().motion == ftxui::Mouse::Motion::Moved) return true;
         if (event.mouse().motion == ftxui::Mouse::Motion::Pressed) return true;
@@ -108,24 +126,23 @@ namespace tuim::interface
 
   void initialize_renderer()
   {
-    renderer = ftxui::Renderer(
-      container,
-      [&]
-      {
-        return ftxui::vbox({
-                 ftxui::hbox({ftxui::text(application::get_information_bar())}) | ftxui::center | ftxui::bold |
-                   (application::paused ? ftxui::color(ftxui::Color::Red) : ftxui::color(ftxui::Color::Blue)),
-                 ftxui::hbox({ftxui::text(application::get_progress_in_minutes()),
-                              ftxui::gaugeRight(application::get_progress_as_percentage()),
-                              ftxui::text(application::get_duration_in_minutes()),
-                              ftxui::text(application::get_formatted_volume())}) |
-                   ftxui::bold |
-                   (application::paused ? ftxui::color(ftxui::Color::Red) : ftxui::color(ftxui::Color::Blue)),
-                 ftxui::separator(),
-                 container->Render(),
-               }) |
-               ftxui::borderEmpty;
-      });
+    renderer = ftxui::Renderer(container,
+                               [&]
+                               {
+                                 return ftxui::vbox({
+                                          ftxui::hbox({ftxui::text(application::get_information_bar())}) |
+                                            ReactiveColor() | ftxui::bold | ftxui::center,
+                                          ftxui::hbox({ftxui::text(application::get_progress_in_minutes()),
+                                                       ftxui::gaugeRight(application::get_progress_as_percentage()),
+                                                       ftxui::text(application::get_duration_in_minutes()),
+                                                       ftxui::text(application::get_formatted_volume()),
+                                                       ftxui::text(application::get_search_text())}) |
+                                            ReactiveColor() | ftxui::bold,
+                                          ftxui::separator(),
+                                          container->Render(),
+                                        }) |
+                                        ftxui::borderEmpty;
+                               });
     song_menu->TakeFocus();
   }
 }
