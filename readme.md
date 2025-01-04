@@ -14,6 +14,8 @@ https://github.com/user-attachments/assets/87bf883f-6ad6-49fc-ba6c-ccc36f908da1
 > - <kbd>J</kbd> or <kbd>K</kbd> to navigate the focused menu by 12 items.
 > - <kbd>T</kbd> or <kbd>B</kbd> to navigate to the top/bottom of the focused menu.
 > - <kbd>h</kbd> or <kbd>l</kbd> to open/close the playlists tab.
+> - <kbd>ctrl</kbd> + <kbd>f</kbd> to toggle search mode, then type in the form `title`, `artist`, `title|artist` or
+>   `artist|title`.
 > - <kbd>return</kbd> to select the focused menu item.
 > - <kbd>s</kbd> to shuffle the current/focused playlist.
 > - <kbd>p</kbd> to pause/unpause.
