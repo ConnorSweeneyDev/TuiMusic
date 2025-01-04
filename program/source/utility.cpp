@@ -1,3 +1,5 @@
+#include <algorithm>
+#include <cctype>
 #include <cstdlib>
 #include <filesystem>
 #include <fstream>
@@ -42,6 +44,21 @@ namespace tuim::utility
         if (file.is_regular_file() && file.path().extension() == ".mp3")
           temporary_songs.push_back(application::Song{file.path(), title, artist});
       }
+      std::sort(
+        temporary_songs.begin(), temporary_songs.end(),
+        [](const application::Song &a, const application::Song &b)
+        {
+          std::string lowercase_title_a = a.title;
+          std::string lowercase_artist_a = a.artist;
+          std::string lowercase_title_b = b.title;
+          std::string lowercase_artist_b = b.artist;
+          std::transform(lowercase_title_a.begin(), lowercase_title_a.end(), lowercase_title_a.begin(), tolower);
+          std::transform(lowercase_artist_a.begin(), lowercase_artist_a.end(), lowercase_artist_a.begin(), tolower);
+          std::transform(lowercase_title_b.begin(), lowercase_title_b.end(), lowercase_title_b.begin(), tolower);
+          std::transform(lowercase_artist_b.begin(), lowercase_artist_b.end(), lowercase_artist_b.begin(), tolower);
+          return lowercase_artist_a < lowercase_artist_b ||
+                 (lowercase_artist_a == lowercase_artist_b && lowercase_title_a < lowercase_title_b);
+        });
       application::Playlist new_playlist = {directory, directory.filename().string(), temporary_songs};
       application::playlists.push_back(std::make_shared<application::Playlist>(new_playlist));
     }

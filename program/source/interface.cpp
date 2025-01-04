@@ -73,7 +73,7 @@ namespace tuim::interface
       });
 
     for (auto &song : application::playlists[(size_t)application::current_playlist_index]->songs)
-      song_menu_entries.push_back(song.title + " ┃ " + song.artist);
+      song_menu_entries.push_back(song.artist + " ┃ " + song.title);
     song_menu = ReactiveMenu(&song_menu_entries, &hovered_song);
     song_menu |= ftxui::CatchEvent(
       [&](ftxui::Event event)
