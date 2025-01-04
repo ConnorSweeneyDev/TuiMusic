@@ -43,7 +43,8 @@ namespace tuim::application
   std::string get_progress_in_minutes();
   float get_progress_as_percentage();
   std::string get_duration_in_minutes();
-  std::string get_search_text();
   std::string get_formatted_volume();
+  std::string get_search_text();
+  int get_closest_match_index();
   void run_loop();
 }

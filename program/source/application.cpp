@@ -1,3 +1,5 @@
+#include <algorithm>
+#include <cctype>
 #include <cmath>
 #include <cstdlib>
 #include <filesystem>
@@ -189,17 +191,41 @@ namespace tuim::application
     return "┃ -:--";
   }
 
+  std::string get_formatted_volume()
+  {
+    if (volume == 100) return " %" + std::to_string(volume);
+    if (volume >= 10) return " %" + std::to_string(volume) + " ";
+    return " %" + std::to_string(volume) + "  ";
+  }
+
   std::string get_search_text()
   {
     if (search_query.empty()) return " ~";
     return " " + search_query;
   }
 
-  std::string get_formatted_volume()
+  int get_closest_match_index()
   {
-    if (volume == 100) return " %" + std::to_string(volume);
-    if (volume >= 10) return " %" + std::to_string(volume) + " ";
-    return " %" + std::to_string(volume) + "  ";
+    if (search_query.empty()) return current_song_index;
+
+    int count = 0;
+    for (auto &song : current_song_playlist->songs)
+    {
+      std::string lowercase_title = song.title;
+      std::string lowercase_artist = song.artist;
+      std::string lowercase_search_query = search_query;
+      std::transform(lowercase_title.begin(), lowercase_title.end(), lowercase_title.begin(), tolower);
+      std::transform(lowercase_artist.begin(), lowercase_artist.end(), lowercase_artist.begin(), tolower);
+      std::transform(lowercase_search_query.begin(), lowercase_search_query.end(), lowercase_search_query.begin(),
+                     tolower);
+      if (lowercase_title.length() >= lowercase_search_query.length())
+        if (lowercase_title.substr(0, lowercase_search_query.length()) == lowercase_search_query) return count;
+      if (lowercase_artist.length() >= lowercase_search_query.length())
+        if (lowercase_artist.substr(0, lowercase_search_query.length()) == lowercase_search_query) return count;
+      count++;
+    }
+
+    return current_song_index;
   }
 
   void run_loop()

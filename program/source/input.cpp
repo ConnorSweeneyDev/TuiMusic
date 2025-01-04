@@ -122,12 +122,14 @@ namespace tuim::input
   bool append_to_search_query(std::string character)
   {
     application::search_query += character;
+    interface::hovered_song = application::get_closest_match_index();
     return true;
   }
 
   bool pop_from_search_query()
   {
     if (!application::search_query.empty()) application::search_query.pop_back();
+    interface::hovered_song = application::get_closest_match_index();
     return true;
   }
 
