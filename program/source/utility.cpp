@@ -57,7 +57,9 @@ namespace tuim::utility
           std::transform(lowercase_title_b.begin(), lowercase_title_b.end(), lowercase_title_b.begin(), tolower);
           std::transform(lowercase_artist_b.begin(), lowercase_artist_b.end(), lowercase_artist_b.begin(), tolower);
           return lowercase_artist_a < lowercase_artist_b ||
-                 (lowercase_artist_a == lowercase_artist_b && lowercase_title_a < lowercase_title_b);
+                 (lowercase_artist_a == lowercase_artist_b && lowercase_title_a < lowercase_title_b) ||
+                 (lowercase_artist_a == lowercase_artist_b && lowercase_title_a == lowercase_title_b &&
+                  a.path.string() < b.path.string());
         });
       application::Playlist new_playlist = {directory, directory.filename().string(), temporary_songs};
       application::playlists.push_back(std::make_shared<application::Playlist>(new_playlist));
