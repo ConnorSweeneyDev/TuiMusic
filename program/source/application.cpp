@@ -162,7 +162,7 @@ namespace tuim::application
     Mix_VolumeMusic((int)real_volume);
 
     Mix_PlayMusic(current_song, 0);
-    current_song_display = new_song.title + " ┃ " + new_song.artist;
+    current_song_display = new_song.artist + " ┃ " + new_song.title;
     paused = false;
     utility::write_state_file();
   }
