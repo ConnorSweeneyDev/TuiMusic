@@ -92,7 +92,15 @@ namespace tuim::input
       interface::hovered_song = application::playlists[(size_t)application::current_playlist_index]->hovered_song;
       interface::song_menu_entries.clear();
       for (auto &song : application::playlists[(size_t)application::current_playlist_index]->songs)
+      {
+        if (song.artist.empty())
+        {
+          interface::song_menu_entries.push_back(song.title);
+          continue;
+        }
+
         interface::song_menu_entries.push_back(song.artist + " ┃ " + song.title);
+      }
 
       if (application::playlists[(size_t)application::current_playlist_index] == application::current_song_playlist)
       {

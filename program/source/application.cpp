@@ -116,8 +116,11 @@ namespace tuim::application
     Mix_VolumeMusic((int)real_volume);
     Mix_PlayMusic(current_song, 0);
     input::seek_to(current_song_percentage);
-    current_song_display = current_song_playlist->songs[(size_t)current_song_index].title + " ┃ " +
-                           current_song_playlist->songs[(size_t)current_song_index].artist;
+    if (current_song_playlist->songs[(size_t)current_song_index].artist.empty())
+      current_song_display = current_song_playlist->songs[(size_t)current_song_index].title;
+    else
+      current_song_display = current_song_playlist->songs[(size_t)current_song_index].title + " ┃ " +
+                             current_song_playlist->songs[(size_t)current_song_index].artist;
     paused = false;
     utility::write_state_file();
   }
@@ -162,7 +165,10 @@ namespace tuim::application
     Mix_VolumeMusic((int)real_volume);
 
     Mix_PlayMusic(current_song, 0);
-    current_song_display = new_song.artist + " ┃ " + new_song.title;
+    if (new_song.artist.empty())
+      current_song_display = new_song.title;
+    else
+      current_song_display = new_song.artist + " ┃ " + new_song.title;
     paused = false;
     utility::write_state_file();
   }

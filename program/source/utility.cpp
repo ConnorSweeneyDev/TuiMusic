@@ -40,6 +40,11 @@ namespace tuim::utility
         std::string title = title_tag.to8Bit(true);
         TagLib::String artist_tag = file_reference.tag()->artist();
         std::string artist = artist_tag.to8Bit(true);
+        if (title.empty() || artist.empty())
+        {
+          title = file.path().filename().string();
+          artist = "";
+        }
 
         if (file.is_regular_file() && file.path().extension() == ".mp3")
           temporary_songs.push_back(application::Song{file.path(), title, artist});

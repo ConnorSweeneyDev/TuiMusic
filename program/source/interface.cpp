@@ -54,9 +54,10 @@ namespace tuim::interface
 
     for (auto &playlist : application::playlists)
       if ((int)playlist->name.length() > playlist_menu_max_width)
-        playlist_menu_max_width = (int)playlist->name.length();
-    playlist_menu_max_width += 3;
-    for (auto &playlist : application::playlists) playlist_menu_entries.push_back(playlist->name);
+        playlist_menu_max_width = (int)playlist->name.length() + (int)std::to_string(playlist->songs.size()).length();
+    playlist_menu_max_width += 6;
+    for (auto &playlist : application::playlists)
+      playlist_menu_entries.push_back(playlist->name + " ┃ " + std::to_string(playlist->songs.size()));
     playlist_menu = ReactiveMenu(&playlist_menu_entries, &hovered_playlist);
     playlist_menu |= ftxui::CatchEvent(
       [&](ftxui::Event event)
@@ -74,7 +75,15 @@ namespace tuim::interface
       });
 
     for (auto &song : application::playlists[(size_t)application::current_playlist_index]->songs)
+    {
+      if (song.artist.empty())
+      {
+        song_menu_entries.push_back(song.title);
+        continue;
+      }
+
       song_menu_entries.push_back(song.artist + " ┃ " + song.title);
+    }
     song_menu = ReactiveMenu(&song_menu_entries, &hovered_song);
     song_menu |= ftxui::CatchEvent(
       [&](ftxui::Event event)
