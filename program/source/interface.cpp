@@ -128,6 +128,8 @@ namespace tuim::interface
         if (event == ftxui::Event::D) return input::volume_down(5);
         if (event == ftxui::Event::n) return input::end_song();
 
+        if (event == ftxui::Event::Escape) return input::quit();
+
         return false;
       });
 
@@ -154,6 +156,7 @@ namespace tuim::interface
             input::menu_select(true);
             return input::toggle_search();
           }
+          if (event == ftxui::Event::Escape) return input::cancel_search();
           if (event == ftxui::Event::ArrowLeft || event == ftxui::Event::ArrowRight) return true;
         }
         else
@@ -177,7 +180,10 @@ namespace tuim::interface
           if (event == ftxui::Event::U) return input::volume_up(5);
           if (event == ftxui::Event::D) return input::volume_down(5);
           if (event == ftxui::Event::n) return input::end_song();
+
+          if (event == ftxui::Event::Escape) return input::quit();
         }
+
         if (event == ftxui::Event::CtrlF) return input::toggle_search();
         return false;
       });
@@ -190,7 +196,6 @@ namespace tuim::interface
     container |= ftxui::CatchEvent(
       [&](ftxui::Event event)
       {
-        if (event == ftxui::Event::Escape) return input::escape();
         if (event.mouse().motion == ftxui::Mouse::Motion::Moved) return true;
         if (event.mouse().motion == ftxui::Mouse::Motion::Pressed) return true;
         return false;

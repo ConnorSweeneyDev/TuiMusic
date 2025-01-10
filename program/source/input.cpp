@@ -122,8 +122,19 @@ namespace tuim::input
 
   bool toggle_search()
   {
-    if (application::searching) application::search_query = "";
+    if (application::searching)
+      application::search_query = "";
+    else
+      application::index_before_search = interface::hovered_song;
     application::searching = !application::searching;
+    return true;
+  }
+
+  bool cancel_search()
+  {
+    application::searching = false;
+    application::search_query = "";
+    interface::hovered_song = application::index_before_search;
     return true;
   }
 
@@ -222,7 +233,7 @@ namespace tuim::input
     return true;
   }
 
-  bool escape()
+  bool quit()
   {
     interface::screen.ExitLoopClosure()();
     utility::write_state_file();

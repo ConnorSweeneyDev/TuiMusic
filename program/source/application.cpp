@@ -212,13 +212,8 @@ namespace tuim::application
 
   int get_closest_match_index()
   {
-    if (search_query.empty())
-    {
-      if (current_song_playlist == playlists[(size_t)current_playlist_index])
-        return current_song_index;
-      else
-        return interface::hovered_song;
-    }
+    if (search_query.empty()) return application::index_before_search;
+
     std::string lowercase_search_query = search_query;
     std::transform(lowercase_search_query.begin(), lowercase_search_query.end(), lowercase_search_query.begin(),
                    tolower);
@@ -283,7 +278,7 @@ namespace tuim::application
       }
     }
 
-    return current_song_index;
+    return interface::hovered_song;
   }
 
   void run_loop()

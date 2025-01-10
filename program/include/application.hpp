@@ -35,6 +35,7 @@ namespace tuim::application
   inline bool paused = false;
   inline bool searching = false;
   inline std::string search_query = "";
+  inline int index_before_search = 0;
 
   void initialize_playlists();
   void initialize_state();

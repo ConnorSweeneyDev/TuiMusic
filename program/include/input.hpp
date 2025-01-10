@@ -10,6 +10,7 @@ namespace tuim::input
   bool menu_select(bool is_song);
   bool shuffle_current_playlist(bool is_song);
   bool toggle_search();
+  bool cancel_search();
   bool append_to_search_query(std::string character);
   bool pop_from_search_query();
 
@@ -20,5 +21,5 @@ namespace tuim::input
   bool volume_up(int amount);
   bool volume_down(int amount);
   bool end_song();
-  bool escape();
+  bool quit();
 }
