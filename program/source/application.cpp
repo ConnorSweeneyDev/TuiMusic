@@ -175,7 +175,7 @@ namespace tuim::application
 
   std::string get_information_bar()
   {
-    std::string icon = searching ? "? " : paused ? "⏸︎ " : "⏵︎ ";
+    std::string icon = paused ? "⏸︎ " : "⏵︎ ";
     return icon + current_song_playlist->name + " ┃ " + current_song_display;
   }
 

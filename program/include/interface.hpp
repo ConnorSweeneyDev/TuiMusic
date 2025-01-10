@@ -10,7 +10,8 @@
 namespace tuim::interface
 {
   ftxui::Decorator ReactiveColor();
-  ftxui::Component ReactiveMenu(std::vector<std::string> *entries, int *selected);
+  ftxui::Component PlaylistMenu(std::vector<std::string> *entries, int *selected);
+  ftxui::Component SongMenu(std::vector<std::string> *entries, int *selected);
   void initialize_menus();
   void initialize_containers();
   void initialize_renderer();

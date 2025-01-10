@@ -30,14 +30,60 @@ namespace tuim::interface
     };
   }
 
-  ftxui::Component ReactiveMenu(std::vector<std::string> *entries, int *selected)
+  ftxui::Component PlaylistMenu(std::vector<std::string> *entries, int *selected)
   {
     auto option = ftxui::MenuOption::Vertical();
     option.focused_entry = ftxui::Ref<int>(selected);
-    option.entries_option.transform = [](ftxui::EntryState state)
+    option.entries_option.transform = [&](ftxui::EntryState state)
     {
-      std::string icon = application::searching ? "? " : application::paused ? "⏸︎ " : "⏵︎ ";
-      state.label = (state.active ? icon : "  ") + state.label;
+      size_t total = application::playlists.size();
+      size_t total_length = std::to_string(total).length();
+
+      int index = state.index + 1;
+      size_t index_length = std::to_string(index).length();
+      std::string index_padding = std::string(total_length - index_length, ' ');
+      std::string index_formatted = index_padding + std::to_string(index) + " ";
+
+      std::string icon_padding = std::string(total_length - 1, ' ');
+      std::string icon = icon_padding + (application::paused ? "⏸︎ " : "⏵︎ ");
+
+      int current_song_playlist_index = 0;
+      for (auto &playlist : application::playlists)
+        if (playlist == application::current_song_playlist)
+          break;
+        else
+          current_song_playlist_index++;
+      bool active = state.index == current_song_playlist_index;
+      state.label = (active ? icon : index_formatted) + state.label;
+      ftxui::Element element = ftxui::text(state.label);
+      if (state.focused) element = element | ftxui::bgcolor(ftxui::Color::RGBA(0, 0, 0, 0));
+      if (state.active) element = element | ftxui::bold | ReactiveColor();
+      return element;
+    };
+    return Menu(entries, selected, option);
+  }
+
+  ftxui::Component SongMenu(std::vector<std::string> *entries, int *selected)
+  {
+    auto option = ftxui::MenuOption::Vertical();
+    option.focused_entry = ftxui::Ref<int>(selected);
+    option.entries_option.transform = [&](ftxui::EntryState state)
+    {
+      size_t total = application::playlists[(size_t)application::current_playlist_index]->songs.size();
+      size_t total_length = std::to_string(total).length();
+
+      int index = state.index + 1;
+      size_t index_length = std::to_string(index).length();
+      std::string index_padding = std::string(total_length - index_length, ' ');
+      std::string index_formatted = index_padding + std::to_string(index) + " ";
+
+      std::string icon_padding = std::string(total_length - 1, ' ');
+      std::string icon = icon_padding + (application::paused ? "⏸︎ " : "⏵︎ ");
+
+      bool active =
+        state.index == application::current_song_index &&
+        application::playlists[(size_t)application::current_playlist_index] == application::current_song_playlist;
+      state.label = (active ? icon : index_formatted) + state.label;
       ftxui::Element element = ftxui::text(state.label);
       if (state.focused) element = element | ftxui::bgcolor(ftxui::Color::RGBA(0, 0, 0, 0));
       if (state.active) element = element | ftxui::bold | ReactiveColor();
@@ -53,12 +99,12 @@ namespace tuim::interface
     screen.SetCursor(cursor);
 
     for (auto &playlist : application::playlists)
-      if ((int)playlist->name.length() > playlist_menu_max_width)
+      if (playlist->name.length() + std::to_string(playlist->songs.size()).length() > (size_t)playlist_menu_max_width)
         playlist_menu_max_width = (int)playlist->name.length() + (int)std::to_string(playlist->songs.size()).length();
-    playlist_menu_max_width += 6;
+    playlist_menu_max_width += ((int)std::to_string(application::playlists.size()).length() - 1) + 6;
     for (auto &playlist : application::playlists)
       playlist_menu_entries.push_back(playlist->name + " ┃ " + std::to_string(playlist->songs.size()));
-    playlist_menu = ReactiveMenu(&playlist_menu_entries, &hovered_playlist);
+    playlist_menu = PlaylistMenu(&playlist_menu_entries, &hovered_playlist);
     playlist_menu |= ftxui::CatchEvent(
       [&](ftxui::Event event)
       {
@@ -71,6 +117,17 @@ namespace tuim::interface
         if (event == ftxui::Event::l || event == ftxui::Event::ArrowRight) return input::menu_open_or_close(false);
         if (event == ftxui::Event::s) return input::shuffle_current_playlist(false);
         if (event == ftxui::Event::Return) return input::menu_select(false);
+
+        if (event == ftxui::Event::p) return input::pause_or_play();
+        if (event == ftxui::Event::L) return input::seek_forward(5);
+        if (event == ftxui::Event::H) return input::seek_backward(5);
+        if (utility::is_number(event.character())) return input::seek_to(std::stoi(event.character()) * 10);
+        if (event == ftxui::Event::u) return input::volume_up(1);
+        if (event == ftxui::Event::d) return input::volume_down(1);
+        if (event == ftxui::Event::U) return input::volume_up(5);
+        if (event == ftxui::Event::D) return input::volume_down(5);
+        if (event == ftxui::Event::n) return input::end_song();
+
         return false;
       });
 
@@ -84,7 +141,7 @@ namespace tuim::interface
 
       song_menu_entries.push_back(song.artist + " ┃ " + song.title);
     }
-    song_menu = ReactiveMenu(&song_menu_entries, &hovered_song);
+    song_menu = SongMenu(&song_menu_entries, &hovered_song);
     song_menu |= ftxui::CatchEvent(
       [&](ftxui::Event event)
       {
