@@ -82,7 +82,7 @@ namespace tuim::input
       Mix_VolumeMusic((int)real_volume);
 
       Mix_PlayMusic(application::current_song, 0);
-      application::current_song_display = interface::song_menu_entries[(size_t)interface::hovered_song];
+      application::current_song_display = new_song.artist + " ┃ " + new_song.title;
       application::paused = false;
       utility::write_state_file();
     }
@@ -99,7 +99,7 @@ namespace tuim::input
           continue;
         }
 
-        interface::song_menu_entries.push_back(song.artist + " ┃ " + song.title);
+        interface::song_menu_entries.push_back("┃ " + song.artist + " ┃ " + song.title);
       }
 
       if (application::playlists[(size_t)application::current_playlist_index] == application::current_song_playlist)

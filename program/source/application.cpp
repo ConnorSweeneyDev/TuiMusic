@@ -119,8 +119,8 @@ namespace tuim::application
     if (current_song_playlist->songs[(size_t)current_song_index].artist.empty())
       current_song_display = current_song_playlist->songs[(size_t)current_song_index].title;
     else
-      current_song_display = current_song_playlist->songs[(size_t)current_song_index].title + " ┃ " +
-                             current_song_playlist->songs[(size_t)current_song_index].artist;
+      current_song_display = current_song_playlist->songs[(size_t)current_song_index].artist + " ┃ " +
+                             current_song_playlist->songs[(size_t)current_song_index].title;
     paused = false;
     utility::write_state_file();
   }

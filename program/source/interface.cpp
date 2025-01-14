@@ -101,9 +101,9 @@ namespace tuim::interface
     for (auto &playlist : application::playlists)
       if (playlist->name.length() + std::to_string(playlist->songs.size()).length() > (size_t)playlist_menu_max_width)
         playlist_menu_max_width = (int)playlist->name.length() + (int)std::to_string(playlist->songs.size()).length();
-    playlist_menu_max_width += ((int)std::to_string(application::playlists.size()).length() - 1) + 6;
+    playlist_menu_max_width += ((int)std::to_string(application::playlists.size()).length() - 1) + 8;
     for (auto &playlist : application::playlists)
-      playlist_menu_entries.push_back(playlist->name + " ┃ " + std::to_string(playlist->songs.size()));
+      playlist_menu_entries.push_back("┃ " + playlist->name + " ┃ " + std::to_string(playlist->songs.size()));
     playlist_menu = PlaylistMenu(&playlist_menu_entries, &hovered_playlist);
     playlist_menu |= ftxui::CatchEvent(
       [&](ftxui::Event event)
@@ -137,11 +137,11 @@ namespace tuim::interface
     {
       if (song.artist.empty())
       {
-        song_menu_entries.push_back(song.title);
+        song_menu_entries.push_back("┃ " + song.title);
         continue;
       }
 
-      song_menu_entries.push_back(song.artist + " ┃ " + song.title);
+      song_menu_entries.push_back("┃ " + song.artist + " ┃ " + song.title);
     }
     song_menu = SongMenu(&song_menu_entries, &hovered_song);
     song_menu |= ftxui::CatchEvent(
