@@ -74,10 +74,10 @@ namespace tuim::interface
 
       int index = state.index + 1;
       size_t index_length = std::to_string(index).length();
-      std::string index_padding = std::string(total_length - index_length, ' ');
+      std::string index_padding = (playlist_menu->Focused() ? " " : "") + std::string(total_length - index_length, ' ');
       std::string index_formatted = index_padding + std::to_string(index) + " ";
 
-      std::string icon_padding = std::string(total_length - 1, ' ');
+      std::string icon_padding = (playlist_menu->Focused() ? " " : "") + std::string(total_length - 1, ' ');
       std::string icon = icon_padding + (application::paused ? "⏸︎ " : "⏵︎ ");
 
       bool active =
