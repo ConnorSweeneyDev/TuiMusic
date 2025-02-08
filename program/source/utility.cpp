@@ -30,6 +30,8 @@ namespace tuim::utility
       std::vector<application::Song> temporary_songs = {};
       for (const auto &file : std::filesystem::directory_iterator(directory))
       {
+        if (file.path().extension() != ".mp3" || !file.is_regular_file()) continue;
+
         TagLib::FileRef file_reference(file.path().string().c_str());
         if (file_reference.isNull())
         {
@@ -46,8 +48,7 @@ namespace tuim::utility
           artist = "";
         }
 
-        if (file.is_regular_file() && file.path().extension() == ".mp3")
-          temporary_songs.push_back(application::Song{file.path(), title, artist});
+        temporary_songs.push_back(application::Song{file.path(), title, artist});
       }
       std::sort(
         temporary_songs.begin(), temporary_songs.end(),
