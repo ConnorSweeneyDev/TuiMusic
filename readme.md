@@ -14,7 +14,9 @@ A terminal-based music player written using SDL, FTXUI and TagLib. It features:
 Playlists are in the form of folders on your filesystem - place absolute paths to folders in the `user/playlists.txt`
 directory and the player will load them on startup. The player will start playing a random song from the first playlist
 and will continue to pick random songs from that playlist after it finishes playing the current one. If you manually
-change the playlist the player will start playing a random song from the new playlist instead.
+change the playlist the player will start playing a random song from the new playlist instead. After adding a new MP3
+file to an existing folder, you should run the player with the `-r` flag to re-cache the playlists and pick up the new
+song.
 
 https://github.com/user-attachments/assets/a1333cd2-cd4d-42e4-bba2-73056ddde9c6
 
