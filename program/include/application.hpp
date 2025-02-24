@@ -14,10 +14,12 @@ namespace tuim::application
     std::filesystem::path path;
     std::string title;
     std::string artist;
+    int num_plays = 0;
   };
   struct Playlist
   {
     std::filesystem::path path;
+    std::filesystem::path data_path;
     std::string name;
     std::vector<Song> songs;
     int hovered_song = 0;
@@ -37,7 +39,7 @@ namespace tuim::application
   inline std::string search_query = "";
   inline int index_before_search = 0;
 
-  void initialize_playlists();
+  void initialize_playlists(int argc, char *argv[]);
   void initialize_state();
   void play_random_song_from_playlist(std::shared_ptr<Playlist> &playlist);
   std::string get_information_bar();

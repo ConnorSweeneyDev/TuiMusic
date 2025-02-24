@@ -1,7 +1,9 @@
 #include <algorithm>
 #include <cctype>
+#include <climits>
 #include <cmath>
 #include <cstdlib>
+#include <cstring>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -21,8 +23,19 @@
 
 namespace tuim::application
 {
-  void initialize_playlists()
+  void initialize_playlists(int argc, char *argv[])
   {
+    bool delete_playlist_data = false;
+    if (argc > 1)
+    {
+      if (strcmp(argv[1], "-r") != 0)
+      {
+        std::cout << "Usage: TuiMusic [-r]" << std::endl;
+        exit(EXIT_FAILURE);
+      }
+      delete_playlist_data = true;
+    }
+
     std::filesystem::path playlists_path = "user/playlists.txt";
     std::ifstream playlists_file(playlists_path);
     if (!std::filesystem::exists(playlists_path) || !playlists_file.is_open())
@@ -51,7 +64,8 @@ namespace tuim::application
       std::cout << "No playlists found in " << playlists_path << "." << std::endl;
       exit(EXIT_FAILURE);
     }
-    utility::populate_playlists(playlist_directories);
+    if (delete_playlist_data) utility::cleanup_playlist_data();
+    for (auto &playlist_directory : playlist_directories) utility::populate_playlist(playlist_directory);
   }
 
   void initialize_state()
@@ -131,10 +145,24 @@ namespace tuim::application
     current_song = nullptr;
     current_song_index = 0;
 
+    std::vector<std::filesystem::path> target_song_paths;
+    int lowest_num_plays = 1000000;
+    for (auto &song : playlist->songs)
+    {
+      if (song.num_plays < lowest_num_plays)
+      {
+        target_song_paths.clear();
+        lowest_num_plays = song.num_plays;
+      }
+      if (song.num_plays == lowest_num_plays) target_song_paths.push_back(song.path);
+    }
+
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dis(0, (int)playlist->songs.size() - 1);
-    current_song_index = dis(gen);
+    std::uniform_int_distribution<> dis(0, (int)target_song_paths.size() - 1);
+    int target_song_index = dis(gen);
+    current_song_index = utility::find_real_index(target_song_paths[(size_t)target_song_index], playlist);
+    playlist->songs[(size_t)current_song_index].num_plays++;
 
     int playlist_location = 0;
     for (auto &existing_playlist : playlists)
