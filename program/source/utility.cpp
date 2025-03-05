@@ -96,6 +96,7 @@ namespace tuim::utility
 
   void cleanup_playlist_data()
   {
+    std::filesystem::remove("user/state.txt");
     std::filesystem::path user_path("user/");
     std::regex pattern(".*_playlist\\.txt$");
     for (const auto &file : std::filesystem::directory_iterator(user_path))

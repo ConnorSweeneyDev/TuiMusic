@@ -151,6 +151,7 @@ namespace tuim::interface
         {
           if (event.is_character()) return input::append_to_search_query(event.character());
           if (event == ftxui::Event::Backspace) return input::pop_from_search_query();
+          if (event == ftxui::Event::CtrlW) return input::pop_word_from_search_query();
           if (event == ftxui::Event::Return)
           {
             input::menu_select(true);

@@ -13,6 +13,7 @@ namespace tuim::input
   bool cancel_search();
   bool append_to_search_query(std::string character);
   bool pop_from_search_query();
+  bool pop_word_from_search_query();
 
   bool pause_or_play();
   bool seek_forward(int percentage);

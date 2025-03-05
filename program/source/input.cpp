@@ -1,3 +1,4 @@
+#include <cctype>
 #include <cmath>
 #include <cstddef>
 #include <cstdio>
@@ -148,6 +149,20 @@ namespace tuim::input
   bool pop_from_search_query()
   {
     if (!application::search_query.empty()) application::search_query.pop_back();
+    interface::hovered_song = application::get_closest_match_index();
+    return true;
+  }
+
+  bool pop_word_from_search_query()
+  {
+    while (!application::search_query.empty() &&
+           (std::isspace(application::search_query.back()) || application::search_query.back() == '|'))
+      application::search_query.pop_back();
+    while (!application::search_query.empty() && !std::isspace(application::search_query.back()))
+    {
+      if (application::search_query.back() == '|') break;
+      application::search_query.pop_back();
+    }
     interface::hovered_song = application::get_closest_match_index();
     return true;
   }
