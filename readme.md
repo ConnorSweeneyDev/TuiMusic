@@ -38,152 +38,52 @@ https://github.com/user-attachments/assets/a1333cd2-cd4d-42e4-bba2-73056ddde9c6
 > - <kbd>U</kbd> or <kbd>D</kbd> to increase/decrease the volume by 5%.
 > - <kbd>escape</kbd> to close the player.
 
-# Building and Executing
-This project is optimized to be built with the following targets in mind:
-- Windows 11 MinGW 64-bit GCC 14.2.0
-- Ubuntu 22.04 GLIBC Version 2.35
+# How to Build
+This project is optimized to be built on Windows using MSVC.
 
-Version information for dependencies can be found in `external/version_info.txt`.
+1. Ensure that you have [MSVC](https://visualstudio.microsoft.com/downloads/) installed.
+2. Ensure that you have [CMake](https://cmake.org/download/) installed, you can run `winget install Kitware.CMake` if
+   you don't.
+3. Ensure that you have [LLVM](https://releases.llvm.org/) installed, you can run `winget install LLVM.LLVM` and put the
+   install location in your environment variables if you don't (for language server and clang-format support).
+4. Execute `script/build.sh` followed by `script/run.sh`.
 
-On Windows the binary is statically linked to all system libraries, but dynamically linked to SDL, SDL_mixer and ftxui.
-On linux the binary is statically linked where possible (only libstdc++ and libgcc) and dynamically linked to everything
-else.
+# How to Update Dependencies
+All dependencies are vendored and stored in the `external` directory. Version information for dependencies can be found
+in `external/version_info.txt`.
 
-After following the platform specific instructions below you can execute `script/build.sh` followed by `script/run.sh`
-(or `script/run.bat` on Windows) from the root of the project to build and run it.
+### SDL
+1. Download the source code for the [release](https://github.com/libsdl-org/SDL/releases) you want.
+2. Put the contents of the extracted folder in `external/SDL2`.
+3. Put a copy of `external/SDL_mixer/include/SDL_mixer.h` in `external/SDL2/include`.
 
-### Windows
-Do the following to ensure your environment is set up correctly:
-- Download a 64-bit [MinGW](https://winlibs.com/) distribution with Clang/LLVM support and put the `[DISTRIBUTION]/bin`
-  directory in your path.
-- Install GNUMake by running `winget install ezwinports.make`.
-- Install ffmpeg by running `winget install Gyan.FFmpeg` (optional for volume normalization).
-- Ensure that you have `[GIT_INSTALLATION]/bin` in your path.
+### SDL_mixer
+1. Download the source code for the [release](https://github.com/libsdl-org/SDL_mixer/releases) you want.
+2. Put the contents of the extracted folder in `external/SDL_mixer`.
+3. Put a copy of `external/SDL_mixer/include/SDL_mixer.h` in `external/SDL2/include`.
+4. Run `external/SDL_mixer/external/download.sh` and remove all git related files in each of the cloned folders.
+5. Remove `external/SDL_mixer/.gitmodules`.
 
-### Linux
-Do the following on Ubuntu to ensure your environment is set up correctly:
-- Only run `sudo apt update && sudo apt upgrade` if you haven't already.
-- Run `sudo apt install git g++ gdb make`.
-- Run `sudo apt install ffmpeg` (optional for volume normalization).
+### FTXUI
+1. Download the source code for the [release](https://github.com/ArthurSonzogni/FTXUI/releases) you want.
+2. Put the contents of the extracted folder in `external/ftxui`.
+3. Remove all git related files in the extracted folder.
 
-After building, do the following to ensure your environment is set up correctly:
-- Only run `sudo apt install alsa xorg openbox` if you don't already have an audio and window manager.
+### TagLib
+1. Download the source code for the [release](https://github.com/taglib/taglib/releases) you want.
+2. Download the source code for [utfcpp](https://github.com/nemtrif/utfcpp/releases) release you want.
+3. Put the contents of the extracted folder in `external/taglib`.
+4. Put the contents of the extracted utfcpp folder in `external/taglib/3rdparty/utfcpp`.
+5. Remove all git related files in both extracted folders.
+6. Remove the line `option(BUILD_SHARED_LIBS "Build shared libraries" OFF)` from `external/taglib/CMakeLists.txt`.
+7. Move all `.h` and `.tcc` files from `external/taglib/taglib` to `external/taglib/include` recursively, ensuring that
+   they are all on the same level.
 
-# Updating Libraries
-Since the library files are all within the project, to update the libraries for each platform some extra steps are
-required.
+### SQLite
+1. Download the amalgamation for the [release](https://www.sqlite.org/download.html) you want.
+2. Put the `sqlite3.c` and `sqlite3.h` files in `external/sqlite/source` and `external/sqlite/include/sqlite`
+   respectively.
 
-## ftxui
-### Windows
-On top of the previous Windows setup, follow these steps to build ftxui for MinGW:
-- Ensure that you have cmake installed, if not run `winget install Kitware.CMake`.
-- `git clone https://github.com/ArthurSonzogni/FTXUI.git && cd FTXUI && mkdir build`.
-- `cmake -B build -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Release -G "MinGW Makefiles"`.
-- `cmake --build build --config Release`.
-
-Now you will have access to some important folders:
-- `FTXUI/include/ftxui` contains the header files that can replace the ones in the `external/include/ftxui` folder of
-  this project. After replacing the contents of that folder, you have to remove all instances of `ftxui/` from the
-  include paths within the new header files.
-- `FTXUI/build` contains the files to replace the `external/library/ftxui/windows` and `binary/windows` folders of
-  this project.
-
-### Linux
-On top of the previous Linux setup, follow these steps to build ftxui for Linux:
-- Ensure that you have cmake installed, if not run `sudo apt install cmake`.
-- `git clone https://github.com/ArthurSonzogni/FTXUI.git && cd FTXUI && mkdir build`.
-- `cmake -B build -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Release -G "Unix Makefiles"`.
-- `cmake --build build --config Release`.
-
-Now you will have access to some important folders:
-- `FTXUI/include/ftxui` contains the header files that can replace the ones in the `external/include/ftxui` folder of
-  this project. After replacing the contents of that folder, you have to remove all instances of `ftxui/` from the
-  include paths within the new header files.
-- `FTXUI/build` contains the files to replace the `external/library/ftxui/linux` and `binary/linux` folders of this
-  project.
-
-## SDL
-### Windows
-On top of the previous Windows setup, go to the [releases](https://github.com/libsdl-org/SDL/releases) page and download
-the file ending `mingw.zip`. Extract this and go to `x86_64-w64-mingw32` and you will have access to three important
-folders:
-- `x86_64-w64-mingw32/include/SDL2` which contains files that can replace the contents of the
-  `external/include/sdl/windows` folder of this project.
-- `x86_64-w64-mingw32/lib` which contains the files to replace the contents of the `external/library/sdl/windows` folder
-  of this project.
-- `x86_64-w64-mingw32/bin` which contains the file that can replace the one in the `binary/windows` folder of this
-  project.
-
-### Linux
-On top of the previous Linux setup, do the following to ensure your environment is set up correctly:
-- Only run `sudo sed -i~orig -e 's/# deb-src/deb-src/' /etc/apt/sources.list` if you haven't already.
-- Only run `sudo apt update` if you just ran the previous command.
-- Run `sudo apt build-dep libsdl2-dev`.
-
-Now you can go to the [releases](https://github.com/libsdl-org/SDL/releases) page and download the
-`SDL2-[VERSION].tar.gz` file. Then run the following commands:
-- `tar -xvzf SDL2-[VERSION].tar.gz`
-- `cd SDL2-[VERSION] && mkdir build && cd build`
-- `../configure`
-- `make`
-
-Now you have two important directories:
-- `SDL2-[VERSION]/include` which contains the files that can replace the ones in the `external/include/sdl/linux` folder
-  of this project.
-- `SDL2-[VERSION]/build/build/.libs` which contains the files that can replace the contents of the
-  `external/library/sdl2/linux` and `binary/linux` folders of this project. 
-
-## SDL_mixer
-### Windows
-On top of the previous Windows setup, go to the [releases](https://github.com/libsdl-org/SDL_mixer/releases) page and
-download the file ending `mingw.zip`. Extract this and go to `x86_64-w64-mingw32` and you will have access to three
-important folders:
-- `x86_64-w64-mingw32/include/SDL2` which contains files that can replace the contents of the
-  `external/include/sdl/windows` folder of this project.
-- `x86_64-w64-mingw32/lib` which contains the files to replace the contents of the `external/library/sdl/windows` folder
-  of this project.
-- `x86_64-w64-mingw32/bin` which contains the file that can replace the one in the `binary/windows` folder of this
-  project.
-
-### Linux
-On top of the previous Linux setup and the SDL setup, do the following to ensure your environment is set up correctly:
-- Go to the `SDL2-[VERSION]/build` folder and run `sudo make install`.
-- Run `sudo apt build-dep libsdl2-mixer-dev`.
-
-Now you can go to the [releases](https://github.com/libsdl-org/SDL_mixer/releases) page and download the
-`SDL2_mixer-[VERSION].tar.gz` file. Then run the following commands:
-- `tar -xvzf SDL2_mixer-[VERSION].tar.gz`
-- `cd SDL2_mixer-[VERSION] && mkdir build && cd build`
-- `../configure`
-- `make`
-
-Now you have two important directories:
-- `SDL2_mixer-[VERSION]/include` which contains the file that can replace the one in the `external/include/sdl/linux`
-  folder of this project.
-- `SDL2_mixer-[VERSION]/build/build/.libs` which contains the files that can replace the contents of the
-  `external/library/sdl/linux` and `binary/linux` folders of this project.
-
-## TagLib
-### Windows
-On top of the previous Windows setup, do the following:
-- Run `git clone https://github.com/taglib/taglib.git && cd taglib && git submodule update --init`
-- Run `cmake -B . -DBUILD_SHARED_LIBS=ON -DVISIBILITY_HIDDEN=ON -DBUILD_EXAMPLES=ON -DBUILD_BINDINGS=ON -DWITH_ZLIB=OFF
-  -DCMAKE_BUILD_TYPE=Release -G 'MinGW Makefiles'`
-- Run `cmake --build . --config Release`
-
-Now you have one important folder; `taglib/taglib` contains the `.dll` and `.dll.a` files that can go into the
-`binary/windows` and `external/library/taglib/windows` folders respectively, and it also contains the `.h` and `.tcc`
-files that can go into the `external/include/taglib` folder. The `.h` and `.tcc` files are spread around not just in
-this folder, but also all of it's subfolders.
-
-### Linux
-On top of the previous Linux setup, do the following:
-- Run `git clone https://github.com/taglib/taglib.git && cd taglib && git submodule update --init`
-- Run `cmake -B . -DBUILD_SHARED_LIBS=ON -DVISIBILITY_HIDDEN=ON -DBUILD_EXAMPLES=ON -DBUILD_BINDINGS=ON -DWITH_ZLIB=OFF
-  -DCMAKE_BUILD_TYPE=Release -G 'Unix Makefiles'`
-- Run `cmake --build . --config Release`
-
-Now you have one important folder; `taglib/taglib` contains the `.so.[VERSION]` and `.so` files that can go into the
-`binary/linux` and `external/library/taglib/linux` folders respectively, and it also contains the `.h` and `.tcc` files
-that can go into the `external/include/taglib` folder. The `.h` and `.tcc` files are spread around not just in this
-folder, but also all of it's subfolders.
+### FFmpeg
+1. Download the pre-built [release](https://www.gyan.dev/ffmpeg/builds/) essentials for the version you want.
+2. Put the executable in `external/ffmpeg`.
