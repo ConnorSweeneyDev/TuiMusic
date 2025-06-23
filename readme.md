@@ -1,3 +1,6 @@
+> [!WARNING]
+> This project has been discontinued. The successor is [TerMusic](https://github.com/ConnorSweeneyDev/TerMusic).
+
 # TuiMusic
 A terminal-based music player written using SDL, FTXUI and TagLib. It features:
 - Pause/Unpause
